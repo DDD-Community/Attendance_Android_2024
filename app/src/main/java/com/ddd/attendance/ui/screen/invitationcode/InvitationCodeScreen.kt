@@ -100,7 +100,7 @@ private fun Content(
     val isFilled by remember { derivedStateOf { value.text.length >= 4 } }
 
     var isWrong by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
 
     Column(
