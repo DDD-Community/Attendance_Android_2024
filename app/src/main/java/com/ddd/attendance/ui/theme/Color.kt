@@ -21,4 +21,7 @@ val DDD_ERROR = Color(color = 0xFFFD1008)
 val DDD_BLUE = Color(color = 0xFF0099FF)
 val DDD_BLUE_100 = Color(color = 0xFFF5F8FF)
 
-val DDD_Neutral_RED = Color(color = 0xFFFFE7E6)
+val DDD_NEUTRAL_RED = Color(color = 0xFFFFE7E6)
+val DDD_BORDER_INACTIVE = Color(color = 0xFFC6C6C6)
+
+val DDD_NEUTRAL_GRAY_20 = Color(color = 0xFFEAEAEA)

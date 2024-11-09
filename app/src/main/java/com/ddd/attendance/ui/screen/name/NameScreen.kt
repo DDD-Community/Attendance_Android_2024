@@ -2,7 +2,7 @@ package com.ddd.attendance.ui.screen.name
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,12 +30,13 @@ import androidx.navigation.NavController
 import com.ddd.attendance.R
 import com.ddd.attendance.ui.LoginProcessViewModel
 import com.ddd.attendance.ui.ScreenName
-import com.ddd.attendance.ui.component.DDDButton
+import com.ddd.attendance.ui.component.DDDNextButton
 import com.ddd.attendance.ui.component.DDDText
 import com.ddd.attendance.ui.component.DDDTopBar
 import com.ddd.attendance.ui.component.TopBarType
-import com.ddd.attendance.ui.theme.DDD_400
 import com.ddd.attendance.ui.theme.DDD_BLACK
+import com.ddd.attendance.ui.theme.DDD_BORDER_INACTIVE
+import com.ddd.attendance.ui.theme.DDD_NEUTRAL_GRAY_20
 import com.ddd.attendance.ui.theme.DDD_WHITE
 
 @Composable
@@ -58,10 +60,17 @@ private fun Content(
     onClickBackButton: () -> Unit,
     onClickNext: () -> Unit
 ) {
+    var value by remember {
+        mutableStateOf(TextFieldValue(""))
+    }
+    val onValueChanged: (TextFieldValue) -> Unit = {
+        value = it
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = DDD_BLACK)
+            .background(color = DDD_BLACK),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         DDDTopBar(
             type = TopBarType.LEFT_IMAGE,
@@ -70,36 +79,26 @@ private fun Content(
         Spacer(modifier = Modifier.height(height = 54.dp))
         DDDText(
             text = "이름이 어떻게 되시나요?",
-            modifier = Modifier.padding(
-                start = 32.dp,
-                top = 54.dp
-            ),
             color = DDD_WHITE,
             fontWeight = FontWeight.Bold,
-            fontSize = 24.sp
+            fontSize = 28.sp
         )
+        Spacer(modifier = Modifier.height(8.dp))
         DDDText(
-            text = "본명으로 입력해주세요",
-            modifier = Modifier.padding(
-                start = 32.dp,
-                top = 16.dp
-            ),
-            color = DDD_400,
+            text = "가입하실 때 사용할 이름을 입력해 주세요",
+            color = DDD_NEUTRAL_GRAY_20,
             fontWeight = FontWeight.W500,
-            fontSize = 16.sp
+            fontSize = 14.sp
         )
         DDDInputText(
-            modifier = Modifier
-                .padding(
-                    start = 32.dp,
-                    end = 32.dp,
-                    top = 54.dp
-                )
+            value = value,
+            onValueChanged = onValueChanged
         )
         Spacer(modifier = Modifier.weight(weight = 1f))
-        DDDButton(
+        DDDNextButton(
             text = "다음",
             modifier = Modifier.fillMaxWidth(),
+            isEnabled = value.text.isNotEmpty(),
             onClick = onClickNext
         )
     }
@@ -107,32 +106,41 @@ private fun Content(
 
 @Composable
 private fun DDDInputText(
-    modifier: Modifier = Modifier
+    value: TextFieldValue,
+    onValueChanged: (TextFieldValue) -> Unit,
 ) {
-    var textFieldValue by remember { mutableStateOf(value = TextFieldValue()) }
-
-    Box(modifier = modifier.fillMaxWidth()) {
-        BasicTextField(
-            value = textFieldValue,
-            onValueChange = {
-                textFieldValue = it
-            },
-            modifier = Modifier
-                .align(alignment = Alignment.CenterStart)
-                .height(height = 50.dp)
+    BasicTextField(
+        modifier = Modifier
+            .padding(
+                start = 32.dp,
+                end = 32.dp,
+                top = 54.dp
+            ),
+        value = value,
+        onValueChange = onValueChanged,
+        textStyle = TextStyle(
+            color = DDD_WHITE,
+            fontSize = 16.sp,
         )
-        Image(
-            painter = painterResource(id = R.drawable.ic_24_code_clear),
-            contentDescription = null,
-            modifier = Modifier.align(alignment = Alignment.CenterEnd)
-        )
-        HorizontalDivider(
-            modifier = Modifier
-                .align(alignment = Alignment.BottomCenter)
-                .padding(top = 8.dp)
-                .background(color = DDD_WHITE)
-                .fillMaxWidth()
-        )
+    ) { innerTextField ->
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = DDD_BORDER_INACTIVE,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+        ) {
+            Box(modifier = Modifier.align(Alignment.CenterStart)) {
+                innerTextField()
+            }
+            Image(
+                painter = painterResource(id = R.drawable.ic_24_code_clear),
+                contentDescription = null,
+                modifier = Modifier.align(alignment = Alignment.CenterEnd),
+            )
+        }
     }
 }
 

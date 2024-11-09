@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ddd.attendance.ui.LoginProcessViewModel
-import com.ddd.attendance.ui.component.DDDButton
+import com.ddd.attendance.ui.component.DDDNextButton
 import com.ddd.attendance.ui.component.DDDText
 import com.ddd.attendance.ui.component.DDDTopBar
 import com.ddd.attendance.ui.component.TopBarType
@@ -112,7 +112,7 @@ private fun Content(
                 )
             }
         }
-        DDDButton(
+        DDDNextButton(
             text = "다음",
             modifier = Modifier
                 .align(alignment = Alignment.BottomCenter)
