@@ -17,7 +17,8 @@
             android:name=".ui.LoginProcessActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Attendance">
+            android:theme="@style/Theme.Attendance"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,6 +28,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,6 +63,7 @@ import com.ddd.attendance.ui.theme.DDD_BLACK
 import com.ddd.attendance.ui.theme.DDD_BLUE
 import com.ddd.attendance.ui.theme.DDD_BLUE_100
 import com.ddd.attendance.ui.theme.DDD_ERROR
+import com.ddd.attendance.ui.theme.DDD_Neutral_RED
 import com.ddd.attendance.ui.theme.DDD_WHITE
 
 @Composable
@@ -84,10 +87,27 @@ private fun Content(
     onClickBackButton: () -> Unit,
     onClickSignup: () -> Unit
 ) {
+    var value by remember { mutableStateOf(TextFieldValue("")) }
+    val onValueChanged: (TextFieldValue) -> Unit = {
+        // 4글자 이상 입력하는 경우 무시
+        value = if (it.text.length > 4) {
+            value
+        } else {
+            it
+        }
+    }
+
+    val isFilled by remember { derivedStateOf { value.text.length >= 4 } }
+
+    var isWrong by remember {
+        mutableStateOf(true)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = DDD_BLACK),
+            .background(color = DDD_BLACK)
+            .imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         DDDTopBar(
@@ -112,7 +132,11 @@ private fun Content(
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(40.dp))
-        DDDInput()
+        DDDInput(
+            value,
+            onValueChanged,
+            isWrong,
+        )
         Spacer(modifier = Modifier.weight(weight = 1f))
         Button(
             modifier = Modifier
@@ -123,6 +147,7 @@ private fun Content(
                 containerColor = DDD_BLUE,
                 disabledContainerColor = DDD_BLUE_100
             ),
+            enabled = isFilled,
             contentPadding = PaddingValues(vertical = 12.dp),
             onClick = onClickSignup
         ) {
@@ -145,51 +170,14 @@ private fun InvalidCodeView(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun DDDInputText(
-    modifier: Modifier = Modifier
+private fun DDDInput(
+    value: TextFieldValue,
+    onValueChanged: (TextFieldValue) -> Unit,
+    isWrong: Boolean,
 ) {
-    var textFieldValue by remember { mutableStateOf(value = TextFieldValue()) }
-
-    Box(modifier = modifier.fillMaxWidth()) {
-        BasicTextField(
-            value = textFieldValue,
-            onValueChange = {
-                textFieldValue = it
-            },
-            modifier = Modifier
-                .align(alignment = Alignment.CenterStart)
-                .height(height = 50.dp)
-        )
-        Image(
-            painter = painterResource(id = R.drawable.ic_24_code_clear),
-            contentDescription = null,
-            modifier = Modifier.align(alignment = Alignment.CenterEnd)
-        )
-        HorizontalDivider(
-            modifier = Modifier
-                .align(alignment = Alignment.BottomCenter)
-                .padding(top = 8.dp)
-                .background(color = DDD_WHITE)
-                .fillMaxWidth()
-        )
-    }
-}
-
-@Composable
-private fun DDDInput() {
-    var value by remember { mutableStateOf(TextFieldValue("013")) }
-    var isFilled by remember { mutableStateOf(value.text.length >= 4) }
-
     BasicTextField(
         value = value,
-        onValueChange = {
-            // 4글자 이상 입력하는 경우 무시하도록 수정
-            value = if (it.text.length > 4) {
-                it
-            } else {
-                value
-            }
-        },
+        onValueChange = onValueChanged,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     ) {
         Row(
@@ -202,20 +190,35 @@ private fun DDDInput() {
                     Box(
                         modifier = Modifier
                             .size(64.dp)
-                            .background(color = DDD_BLUE_100, shape = RoundedCornerShape(8.dp)),
+                            .background(
+                                color = if (!isWrong) DDD_BLUE_100 else DDD_Neutral_RED,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .then(
+                                if (isWrong) Modifier.border(
+                                    width = 2.dp,
+                                    color = DDD_ERROR,
+                                    shape = RoundedCornerShape(16.dp)
+                                ) else Modifier
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = digit.toString(),
                             fontWeight = FontWeight.Bold,
                             fontSize = 36.sp,
-                        )
+
+                            )
                     }
                 } else {
                     Box(
                         modifier = Modifier
                             .size(64.dp)
-                            .border(width = 2.dp, color = DDD_BLUE_100, shape = RoundedCornerShape(16.dp)),
+                            .border(
+                                width = 2.dp,
+                                color = DDD_BLUE_100,
+                                shape = RoundedCornerShape(16.dp)
+                            ),
                     )
                 }
             }
@@ -241,5 +244,9 @@ private fun P2() {
 @Preview(name = "비밀번호 입력 칸")
 @Composable
 private fun P3() {
-    DDDInput()
+    DDDInput(
+        value = TextFieldValue("0123"),
+        onValueChanged = {},
+        isWrong = false
+    )
 }
