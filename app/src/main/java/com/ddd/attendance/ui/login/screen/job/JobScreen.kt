@@ -1,4 +1,4 @@
-package com.ddd.attendance.ui.screen.job
+package com.ddd.attendance.ui.login.screen.job
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -23,15 +22,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ddd.attendance.ui.LoginProcessViewModel
-import com.ddd.attendance.ui.ScreenName
+import com.ddd.attendance.ui.login.LoginProcessViewModel
+import com.ddd.attendance.ui.login.ScreenName
 import com.ddd.attendance.ui.component.DDDNextButton
 import com.ddd.attendance.ui.component.DDDProgressbar
 import com.ddd.attendance.ui.component.DDDSelector
 import com.ddd.attendance.ui.component.DDDText
 import com.ddd.attendance.ui.component.DDDTopBar
 import com.ddd.attendance.ui.component.TopBarType
-import com.ddd.attendance.ui.theme.DDD_800
 import com.ddd.attendance.ui.theme.DDD_BLACK
 import com.ddd.attendance.ui.theme.DDD_NEUTRAL_GRAY_20
 import com.ddd.attendance.ui.theme.DDD_WHITE

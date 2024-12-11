@@ -1,4 +1,4 @@
-package com.ddd.attendance.ui
+package com.ddd.attendance.ui.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -9,11 +9,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ddd.attendance.ui.screen.affiliation.AffiliationScreen
-import com.ddd.attendance.ui.screen.invitationcode.InvitationCodeScreen
-import com.ddd.attendance.ui.screen.job.JobScreen
-import com.ddd.attendance.ui.screen.login.LoginScreen
-import com.ddd.attendance.ui.screen.name.NameScreen
+import com.ddd.attendance.ui.login.screen.affiliation.AffiliationScreen
+import com.ddd.attendance.ui.login.screen.invitationcode.InvitationCodeScreen
+import com.ddd.attendance.ui.login.screen.job.JobScreen
+import com.ddd.attendance.ui.login.screen.login.LoginScreen
+import com.ddd.attendance.ui.login.screen.name.NameScreen
 import com.ddd.attendance.ui.theme.DDD_BLACK
 
 @Composable

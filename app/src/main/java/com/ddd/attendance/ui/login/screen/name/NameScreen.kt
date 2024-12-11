@@ -1,4 +1,4 @@
-package com.ddd.attendance.ui.screen.name
+package com.ddd.attendance.ui.login.screen.name
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ddd.attendance.R
-import com.ddd.attendance.ui.LoginProcessViewModel
-import com.ddd.attendance.ui.ScreenName
+import com.ddd.attendance.ui.login.LoginProcessViewModel
+import com.ddd.attendance.ui.login.ScreenName
 import com.ddd.attendance.ui.component.DDDNextButton
 import com.ddd.attendance.ui.component.DDDProgressbar
 import com.ddd.attendance.ui.component.DDDText

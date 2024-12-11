@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">Attendance</string>
+    <string name="name">%s님</string>
+    <string name="count_people">%s명</string>
+
+    <string name="attendance_status">출석 현황</string>
+    <string name="qr_code">QR 코드</string>
+    <string name="schedule">일정</string>
+
+    <string name="member_attendance">출석</string>
+    <string name="member_tardy">지각</string>
+    <string name="member_absent">결석</string>
+    <string name="member_summary">요약</string>
+    <string name="member_attendance_status">%s님의 출석 현황</string>
+    <string name="member_times">%s회</string>
+    <string name="member_schedule_month">%s월</string>
+    <string name="member_activity_period">활동기간 : %s</string>
+    <string name="member_th_schedule">%s기 일정표</string>
 </resources>

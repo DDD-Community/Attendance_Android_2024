@@ -1,4 +1,4 @@
-package com.ddd.attendance.ui
+package com.ddd.attendance.ui.login
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
