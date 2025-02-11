@@ -10,13 +10,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,8 +36,11 @@ class MemberViewModel @Inject constructor(
         .flatMapLatest { id ->
             memberAttendanceUseCase(id)
                 .map { data ->
-                    if (data.attendanceRecords.isNotEmpty()) MemberAttendanceUiState.Success(data.attendanceRecords)
-                    else MemberAttendanceUiState.Empty
+                    if (data.attendanceRecords.isNotEmpty()) {
+                        MemberAttendanceUiState.Success(data.attendanceRecords)
+                    } else {
+                        MemberAttendanceUiState.Empty
+                    }
                 }
                 .catch { throwable ->
                     emit(MemberAttendanceUiState.Error(throwable.message.default()))
