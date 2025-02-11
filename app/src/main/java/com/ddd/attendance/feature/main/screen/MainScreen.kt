@@ -26,14 +26,12 @@ fun MainScreen() {
         ) {
             composable(route = ScreenName.MEMBER.name) {
                 MemberScreen(
-                    navController = navController,
-                    viewModel = viewModel
+                    navController = navController
                 )
             }
             composable(route = ScreenName.ADMIN.name) {
                 AdminScreen(
-                    navController = navController,
-                    viewModel = viewModel
+                    navController = navController
                 )
             }
         }

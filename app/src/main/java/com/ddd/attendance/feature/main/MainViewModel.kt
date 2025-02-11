@@ -27,13 +27,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private val _isPermissionRequested = MutableStateFlow(false)
-    val isPermissionRequested: StateFlow<Boolean> = _isPermissionRequested
-
-    fun setPermissionRequested(value: Boolean) {
-        _isPermissionRequested.value = value
-    }
-
     private fun getDummyLoginMethodAsync(): String {
         return "member"
     }

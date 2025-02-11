@@ -9,4 +9,7 @@ data class MemberAttendanceResponse(
     @SerialName("absent_count") val absentCount: Int,
     @SerialName("attendance_records") val attendanceRecords: List<MemberAttendanceRecordResponse>
 )
-data class MemberAttendanceRecordResponse(val test: String) //서버에서 아직 정의되지 않음
+data class MemberAttendanceRecordResponse(
+    val test: String,
+    val data: String
+) //서버에서 아직 정의되지 않음

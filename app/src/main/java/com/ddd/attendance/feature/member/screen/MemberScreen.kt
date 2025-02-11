@@ -41,6 +41,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ddd.attendance.R
 import com.ddd.attendance.core.designsystem.AttendanceStatusRow
@@ -54,17 +56,19 @@ import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_20
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_90
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
 import com.ddd.attendance.feature.main.MainViewModel
+import com.ddd.attendance.feature.member.MemberViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MemberScreen(
     navController: NavController,
-    viewModel: MainViewModel
+    viewModel: MemberViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val permissionRequestedState = viewModel.isPermissionRequested.collectAsState()
+    val attendanceUiState = viewModel.attendanceUiState.collectAsStateWithLifecycle()
 
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = SheetState(
@@ -122,7 +126,7 @@ fun MemberScreen(
                         if (isPermissionGranted.value) {
                             bottomSheetStateChange()
                         } else {
-                            viewModel.setPermissionRequested(true)
+                            viewModel.permissionRequested(true)
                         }
                     },
                     onClickBackButton = {
@@ -134,12 +138,12 @@ fun MemberScreen(
                     RequestCameraPermission(
                         context = context,
                         onPermissionGranted = {
-                            viewModel.setPermissionRequested(false)
+                            viewModel.permissionRequested(false)
                             isPermissionGranted.value = true
                             bottomSheetStateChange()
                         },
                         onPermissionDenied = {
-                            viewModel.setPermissionRequested(false)
+                            viewModel.permissionRequested(false)
                             isPermissionGranted.value = false
                         }
                     )
