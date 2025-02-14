@@ -56,7 +56,7 @@ fun DDDToolTip(
                 color = DDD_NEUTRAL_GRAY_90,
                 textStyle = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Medium,
-                fontSize = 14.sp
+                fontSize = 10.sp
             )
         }
     }

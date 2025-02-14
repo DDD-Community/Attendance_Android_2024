@@ -33,7 +33,6 @@ import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_80
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_90
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_ORANGE_40
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
-import com.ddd.attendance.core.utils.noRippleClickable
 
 @Composable
 fun DDDMemberSituation(
@@ -88,9 +87,7 @@ fun DDDMemberSituation(
 
 @Composable
 fun AttendanceStatusRow(
-    modifier: Modifier = Modifier,
-    onPressQrcode:() -> Unit,
-    onPressMyPage:() -> Unit
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
@@ -100,22 +97,6 @@ fun AttendanceStatusRow(
     ) {
         Image(
             painter = painterResource(R.drawable.ic_44_logo_black),
-            contentDescription = "Arrow Icon"
-        )
-
-        Spacer(modifier = Modifier.weight(1F))
-
-        Image(
-            modifier = Modifier.noRippleClickable(onClick = onPressQrcode),
-            painter = painterResource(R.drawable.ic_36_qr_code),
-            contentDescription = "Arrow Icon"
-        )
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Image(
-            modifier = Modifier.noRippleClickable(onClick = onPressMyPage),
-            painter = painterResource(R.drawable.ic_36_my_info),
             contentDescription = "Arrow Icon"
         )
     }
@@ -198,10 +179,7 @@ fun DDDAdminSituationItem(
 @Preview(name = "공통 카드 타이틀")
 @Composable
 private fun P1() {
-    AttendanceStatusRow(
-        onPressQrcode = {},
-        onPressMyPage = {}
-    )
+    AttendanceStatusRow()
 }
 
 @Preview(name = "현황 카드")
