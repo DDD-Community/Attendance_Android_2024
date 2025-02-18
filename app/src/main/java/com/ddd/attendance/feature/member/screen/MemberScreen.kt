@@ -42,7 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ddd.attendance.R
 import com.ddd.attendance.core.designsystem.AttendanceStatusRow
@@ -55,7 +54,6 @@ import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_BLUE_20
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_20
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_90
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
-import com.ddd.attendance.feature.main.MainViewModel
 import com.ddd.attendance.feature.member.MemberViewModel
 import kotlinx.coroutines.launch
 
@@ -68,8 +66,7 @@ fun MemberScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val permissionRequestedState = viewModel.isPermissionRequested.collectAsState()
-    val attendanceUiState = viewModel.attendanceUiState.collectAsStateWithLifecycle()
-
+    val isPermissionGranted = remember { mutableStateOf(checkCameraPermission(context)) }
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = SheetState(
             density = LocalDensity.current,
@@ -79,28 +76,13 @@ fun MemberScreen(
         )
     )
 
-    val isPermissionGranted = remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-
-    // QR 바텀 시트 열기/닫기
     val bottomSheetStateChange = {
         coroutineScope.launch {
             val sheetState = scaffoldState.bottomSheetState
-            if (sheetState.isVisible) {
-                sheetState.hide()
-            } else {
-                sheetState.expand()
-            }
+            if (sheetState.isVisible) sheetState.hide() else sheetState.expand()
         }
     }
 
-    // 뒤로가기/QR 바텀 시트 닫기
     val handleBackButton = {
         coroutineScope.launch {
             val sheetState = scaffoldState.bottomSheetState
@@ -110,28 +92,17 @@ fun MemberScreen(
 
     BottomSheetQrScaffold(
         scaffoldState = scaffoldState,
-        onCloseImageClicked = {
-            handleBackButton()
-        },
-        onQrCodeScanned = { qrData ->
-
-        },
+        onQrCodeScanned = {},
+        onCloseClicked = { handleBackButton() },
         bodyContent = {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            Box(modifier = Modifier.fillMaxSize()) {
                 Content(
-                    onPressMyPage = {},
+                    onPressMyInfo = {},
                     onPressQrcode = {
-                        if (isPermissionGranted.value) {
-                            bottomSheetStateChange()
-                        } else {
-                            viewModel.permissionRequested(true)
-                        }
+                        if (isPermissionGranted.value) bottomSheetStateChange()
+                        else viewModel.permissionRequested(true)
                     },
-                    onClickBackButton = {
-                        handleBackButton()
-                    }
+                    onBackClicked = { handleBackButton() }
                 )
 
                 if (permissionRequestedState.value) {
@@ -155,94 +126,94 @@ fun MemberScreen(
 
 @Composable
 private fun Content(
-    onPressMyPage: () -> Unit,
+    onPressMyInfo: () -> Unit,
     onPressQrcode: () -> Unit,
-    onClickBackButton: () -> Unit
+    onBackClicked: () -> Unit
 ) {
+    BackHandler { onBackClicked() }
     val schedules = getSchedules()
-
-    BackHandler { onClickBackButton() }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(DDD_BLACK)
     ) {
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 88.dp, start = 24.dp, end = 24.dp)
+        ) {
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Column {
+                    DDDText(
+                        text = stringResource(R.string.member_attendance_status, "김디디"),
+                        color = DDD_WHITE,
+                        textStyle = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    DDDText(
+                        text = stringResource(R.string.member_activity_period, "2025.03.12 ~ 2025.08.12"),
+                        color = DDD_NEUTRAL_GRAY_20,
+                        textStyle = MaterialTheme.typography.bodySmall
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    DDDMemberSituation(attendanceCount = 8, tardyCount = 2, absentCount = 1)
+
+                    Spacer(Modifier.height(56.dp))
+
+                    DDDText(
+                        text = stringResource(R.string.member_th_schedule, "12"),
+                        color = DDD_WHITE,
+                        textStyle = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+                }
+            }
+            items(schedules) { schedule ->
+                ScheduleItem(schedule)
+                Spacer(Modifier.height(12.dp))
+            }
+        }
+
+        AttendanceStatusRow(
+            modifier = Modifier,
+            onPressQrcode = onPressQrcode,
+            onPressMyInfo = onPressMyInfo
+        )
+    }
+
+    /*LazyColumn(modifier = Modifier.fillMaxWidth()) {
             item {
                 Spacer(Modifier.height(36.dp))
-                HeaderSection(onPressMyPage, onPressQrcode)
+                HeaderSection(
+                    onPressQrcode = onPressQrcode,
+                    onPressMyPage = onPressMyInfo
+                )
             }
             item {
                 Spacer(Modifier.height(20.dp))
                 BodySection()
             }
             items(schedules) { schedule ->
-                ScheduleItem(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    schedule = schedule
-                )
+                ScheduleItem(schedule)
                 Spacer(Modifier.height(12.dp))
             }
-        }
-    }
+        }*/
 }
 
 @Composable
-private fun HeaderSection(
-    onPressMyPage: () -> Unit,
-    onPressQrcode: () -> Unit
-) {
-    AttendanceStatusRow(
-        modifier = Modifier.padding(start = 16.dp, end = 24.dp),
-        onPressQrcode = onPressQrcode,
-        onPressMyPage = onPressMyPage
-    )
-}
-
-@Composable
-private fun BodySection() {
-    Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-        DDDText(
-            text = stringResource(R.string.member_attendance_status, "김디디"),
-            color = DDD_WHITE,
-            textStyle = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        DDDText(
-            text = stringResource(R.string.member_activity_period, "2025.03.12 ~ 2025.08.12"),
-            color = DDD_NEUTRAL_GRAY_20,
-            textStyle = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Normal
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        DDDMemberSituation(attendanceCount = 8, tardyCount = 2, absentCount = 1)
-
-        Spacer(Modifier.height(56.dp))
-
-        DDDText(
-            text = stringResource(R.string.member_th_schedule, "12"),
-            color = DDD_WHITE,
-            textStyle = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Medium
-        )
-
-        Spacer(Modifier.height(16.dp))
-    }
-}
-
-@Composable
-private fun ScheduleItem(
-    modifier: Modifier = Modifier,
-    schedule: Schedule
-) {
+private fun ScheduleItem(schedule: Schedule) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(DDD_NEUTRAL_GRAY_90)
@@ -259,25 +230,20 @@ private fun ScheduleItem(
 @Composable
 private fun ScheduleDateBox(schedule: Schedule) {
     Box(
-        modifier = Modifier
-            .size(54.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(DDD_NEUTRAL_BLUE_20),
+        modifier = Modifier.size(54.dp).clip(RoundedCornerShape(10.dp)).background(DDD_NEUTRAL_BLUE_20),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             DDDText(
                 text = schedule.month,
                 color = DDD_BLACK,
-                textStyle = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Medium
+                textStyle = MaterialTheme.typography.bodySmall
             )
             Spacer(Modifier.height(4.dp))
             DDDText(
                 text = schedule.day,
                 color = DDD_BLACK,
-                textStyle = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium
+                textStyle = MaterialTheme.typography.titleSmall
             )
         }
     }
@@ -296,8 +262,7 @@ private fun ScheduleDetails(schedule: Schedule) {
         DDDText(
             text = schedule.content,
             color = DDD_NEUTRAL_GRAY_20,
-            textStyle = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Normal
+            textStyle = MaterialTheme.typography.bodySmall
         )
     }
 }
@@ -308,30 +273,23 @@ fun RequestCameraPermission(
     onPermissionGranted: () -> Unit,
     onPermissionDenied: () -> Unit
 ) {
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            onPermissionGranted()
-        } else {
-            onPermissionDenied()
-        }
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) onPermissionGranted() else onPermissionDenied()
     }
 
     LaunchedEffect(Unit) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            onPermissionGranted()
-        } else {
-            permissionLauncher.launch(Manifest.permission.CAMERA)
-        }
+        if (checkCameraPermission(context)) onPermissionGranted() else permissionLauncher.launch(Manifest.permission.CAMERA)
     }
 }
 
-private fun getSchedules(): List<Schedule> = listOf(
-    Schedule("6월", "11", "오리엔테이션", "커리큘럼에 대한 설명 문구 작성"),
-    Schedule("6월", "22", "부스팅 데이 1", "커리큘럼에 대한 설명 문구 작성"),
-    Schedule("7월", "06", "St. Patrick's Day", "Irish cultural celebration"),
-    Schedule("6월", "25", "April Fools' Day", "Day for jokes and pranks"),
-    Schedule("9월", "21", "부스팅 데이 2", "설명 문구 작성"),
-    Schedule("10월", "11", "직군 세션", "놀자 놀자")
+private fun checkCameraPermission(context: Context) =
+    ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+
+private fun getSchedules() = listOf(
+    Schedule("6월", "11", "오리엔테이션", "설명"),
+    Schedule("6월", "22", "부스팅 데이 1", "설명"),
+    Schedule("7월", "06", "St. Patrick's Day", "설명"),
+    Schedule("6월", "25", "April Fools' Day", "설명"),
+    Schedule("9월", "21", "부스팅 데이 2", "설명"),
+    Schedule("10월", "11", "직군 세션", "설명")
 )

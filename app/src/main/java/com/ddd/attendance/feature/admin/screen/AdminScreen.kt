@@ -9,7 +9,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.feature.admin.AdminViewModel
-import com.ddd.attendance.feature.main.MainViewModel
 
 @Composable
 fun AdminScreen(

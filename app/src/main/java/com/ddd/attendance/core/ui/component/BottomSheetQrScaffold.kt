@@ -1,5 +1,6 @@
 package com.ddd.attendance.core.ui.component
 
+import android.content.Context
 import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -13,6 +14,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,9 +39,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.ddd.attendance.R
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_BLUE_40
+import com.google.common.util.concurrent.ListenableFuture
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.DecodeHintType
@@ -52,23 +56,21 @@ import com.google.zxing.common.HybridBinarizer
 @Composable
 fun BottomSheetQrScaffold(
     scaffoldState: BottomSheetScaffoldState,
-    onCloseImageClicked: () -> Unit,
+    onCloseClicked: () -> Unit,
     onQrCodeScanned: (String) -> Unit,
     bodyContent: @Composable () -> Unit
 ) {
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        sheetShape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
-        sheetDragHandle = {
-            Box(modifier = Modifier.fillMaxWidth().height(0.dp))
-        },
+        sheetShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
+        sheetDragHandle = { Spacer(modifier = Modifier.height(0.dp)) },
         sheetContent = {
             BottomSheetContent(
-                onCloseImageClicked = onCloseImageClicked,
+                onCloseClicked = onCloseClicked,
                 onQrCodeScanned = onQrCodeScanned,
-                stopState = if (scaffoldState.bottomSheetState.isVisible) false else true,
+                isScanning = scaffoldState.bottomSheetState.isVisible
             )
-        },
+        }
     ) {
         bodyContent()
     }
@@ -76,14 +78,15 @@ fun BottomSheetQrScaffold(
 
 @Composable
 fun BottomSheetContent(
-    onCloseImageClicked: () -> Unit,
+    onCloseClicked: () -> Unit,
     onQrCodeScanned: (String) -> Unit,
-    stopState: Boolean,
+    isScanning: Boolean,
     cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
+
     val preview = remember { Preview.Builder().build() }
     val imageAnalyzer = remember {
         ImageAnalysis.Builder()
@@ -94,87 +97,44 @@ fun BottomSheetContent(
     var borderColor by remember { mutableStateOf(Color.Transparent) }
     var borderWidth by remember { mutableStateOf(0.dp) }
 
+    LaunchedEffect(isScanning) {
+        setupCamera(
+            isScanning = isScanning,
+            cameraProviderFuture = cameraProviderFuture,
+            lifecycleOwner = lifecycleOwner,
+            preview = preview,
+            imageAnalyzer = imageAnalyzer,
+            cameraSelector = cameraSelector,
+            context = context,
+            onQrCodeScanned = { data ->
+                if (data.isNotBlank()) {
+                    borderWidth = 4.dp
+                    borderColor = DDD_NEUTRAL_BLUE_40
+                    onQrCodeScanned(data)
+                } else {
+                    borderWidth = 0.dp
+                    borderColor = Color.Transparent
+                }
+            }
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.95f)
+            .fillMaxHeight(0.9f)
     ) {
-        LaunchedEffect(stopState) {
-            val cameraProvider = cameraProviderFuture.get()
-
-            if (!stopState) {
-                try {
-                    cameraProvider.unbindAll()
-
-                    val qrCodeReader = MultiFormatReader().apply {
-                        setHints(
-                            mapOf(
-                                DecodeHintType.POSSIBLE_FORMATS to listOf(BarcodeFormat.QR_CODE)
-                            )
-                        )
-                    }
-
-                    imageAnalyzer.setAnalyzer(
-                        ContextCompat.getMainExecutor(context)
-                    ) { imageProxy ->
-                        processImageProxy(
-                            imageProxy = imageProxy,
-                            qrCodeReader = qrCodeReader,
-                            stopState = stopState,
-                            onQrCodeScanned = { data ->
-                                //data.contains("Hello world!") 재현용 qr code 값 Hello world!
-                                if (data.isNotBlank()) {
-                                    borderWidth = 4.dp
-                                    borderColor = DDD_NEUTRAL_BLUE_40
-                                    onQrCodeScanned(data)
-                                } else {
-                                    borderWidth = 0.dp
-                                    borderColor = Color.Transparent
-                                }
-                            }
-                        )
-                    }
-
-                    cameraProvider.bindToLifecycle(
-                        lifecycleOwner,
-                        cameraSelector,
-                        preview,
-                        imageAnalyzer
-                    )
-                } catch (e: Exception) {
-                    Log.e("CameraSetup", "Failed to set up camera: $e")
-                }
-            } else {
-                cameraProvider.unbindAll()
-            }
-        }
-
-        if (!stopState) {
-            AndroidView(
-                modifier = Modifier
-                    .clipToBounds(),
-                factory = { ctx ->
-                    PreviewView(ctx).apply {
-                        implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-                    }
-                },
-                update = { previewView ->
-                    if (previewView.surfaceProvider != preview.surfaceProvider) {
-                        preview.surfaceProvider = previewView.surfaceProvider
-                    }
-                }
-            )
+        if (isScanning) {
+            setupPreviewView(preview)
         }
 
         Image(
             modifier = Modifier
-                .padding(start = 24.dp, top = 24.dp)
+                .padding(24.dp)
                 .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() },
-                    onClick = {
-                        onCloseImageClicked()
-                    }
+                    onClick = onCloseClicked
                 ),
             painter = painterResource(R.drawable.ic_36_qr_clear),
             contentDescription = "QR Finish"
@@ -183,71 +143,90 @@ fun BottomSheetContent(
         Box(
             modifier = Modifier
                 .align(Alignment.Center)
-                .size(
-                    width = 240.dp,
-                    height = 240.dp
-                )
-                .border(
-                    width = borderWidth,
-                    color = borderColor,
-                    shape = RoundedCornerShape(20.dp)
-                )
+                .size(240.dp)
+                .border(width = borderWidth, color = borderColor, shape = RoundedCornerShape(20.dp))
         )
     }
 }
 
+/**
+ * 카메라 설정 및 QR 코드 스캔 처리
+ */
+private fun setupCamera(
+    isScanning: Boolean,
+    cameraProviderFuture: ListenableFuture<ProcessCameraProvider>,
+    lifecycleOwner: LifecycleOwner,
+    preview: Preview,
+    imageAnalyzer: ImageAnalysis,
+    cameraSelector: CameraSelector,
+    context: Context,
+    onQrCodeScanned: (String) -> Unit
+) {
+    val cameraProvider = cameraProviderFuture.get()
+    cameraProvider.unbindAll()
+
+    if (isScanning) {
+        try {
+            val qrCodeReader = MultiFormatReader().apply {
+                setHints(mapOf(DecodeHintType.POSSIBLE_FORMATS to listOf(BarcodeFormat.QR_CODE)))
+            }
+
+            imageAnalyzer.setAnalyzer(
+                ContextCompat.getMainExecutor(context)
+            ) { imageProxy ->
+                processImageProxy(imageProxy, qrCodeReader, onQrCodeScanned)
+            }
+
+            cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview, imageAnalyzer)
+        } catch (e: Exception) {
+            Log.e("CameraSetup", "Failed to set up camera: $e")
+        }
+    }
+}
+
+/**
+ * 카메라 프리뷰 설정
+ */
+@Composable
+private fun setupPreviewView(preview: Preview) {
+    AndroidView(
+        modifier = Modifier.clipToBounds(),
+        factory = { ctx -> PreviewView(ctx).apply { implementationMode = PreviewView.ImplementationMode.COMPATIBLE } },
+        update = { previewView ->
+            if (previewView.surfaceProvider != preview.surfaceProvider) {
+                preview.surfaceProvider = previewView.surfaceProvider
+            }
+        }
+    )
+}
+
+/**
+ * QR 코드 스캔 이미지 처리
+ */
 @androidx.annotation.OptIn(ExperimentalGetImage::class)
 private fun processImageProxy(
     imageProxy: ImageProxy,
     qrCodeReader: MultiFormatReader,
-    onQrCodeScanned: (String) -> Unit,
-    stopState: Boolean
+    onQrCodeScanned: (String) -> Unit
 ) {
-    if (stopState) {
-        imageProxy.close()
-        return
-    }
+    val image = imageProxy.image ?: return imageProxy.close()
 
-    val image = imageProxy.image
-    if (image != null) {
+    try {
         val buffer = image.planes[0].buffer
-        val data = ByteArray(buffer.remaining())
-        buffer.get(data)
-
-        val width = image.width
-        val height = image.height
-
-        val centerX = width / 2
-        val centerY = height / 2
-        val boxSize = 240 // 네모 크기
-        val left = maxOf(0, centerX - boxSize / 2)
-        val top = maxOf(0, centerY - boxSize / 2)
+        val data = ByteArray(buffer.remaining()).apply { buffer.get(this) }
 
         val source = PlanarYUVLuminanceSource(
-            data,
-            width,
-            height,
-            left,
-            top,
-            boxSize,
-            boxSize,
-            false
+            data, image.width, image.height,
+            image.width / 2 - 120, image.height / 2 - 120, 240, 240, false
         )
-
         val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
 
-        try {
-            val result = qrCodeReader.decode(binaryBitmap)
-            Log.d("QRCodeScanner", result.text)
-            onQrCodeScanned(result.text)
-        } catch (e: NotFoundException) {
-            onQrCodeScanned("")
-        } catch (e: Exception) {
-            onQrCodeScanned("")
-        } finally {
-            imageProxy.close()
-        }
-    } else {
+        onQrCodeScanned(qrCodeReader.decode(binaryBitmap).text)
+    } catch (_: NotFoundException) {
+        onQrCodeScanned("")
+    } catch (_: Exception) {
+        onQrCodeScanned("")
+    } finally {
         imageProxy.close()
     }
 }

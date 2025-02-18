@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-
 plugins {
     alias(notation = libs.plugins.android.application)
     alias(notation = libs.plugins.jetbrains.kotlin.android)
@@ -92,6 +90,7 @@ dependencies {
     implementation(dependencyNotation = libs.gson)
     implementation(dependencyNotation = libs.converter.serialization)
     implementation(dependencyNotation = libs.kotlin.serialization)
+    implementation(libs.androidx.constraintlayout.compose)
 
     implementation(dependencyNotation = libs.glide.core)
 
