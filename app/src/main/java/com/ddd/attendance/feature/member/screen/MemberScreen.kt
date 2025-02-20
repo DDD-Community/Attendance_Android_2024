@@ -132,11 +132,13 @@ private fun Content(
 ) {
     BackHandler { onBackClicked() }
     val schedules = getSchedules()
+    BackHandler { onBackClicked() }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(DDD_BLACK)
+
     ) {
         LazyColumn(
             modifier = Modifier
@@ -190,24 +192,41 @@ private fun Content(
             onPressMyInfo = onPressMyInfo
         )
     }
+}
 
-    /*LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            item {
-                Spacer(Modifier.height(36.dp))
-                HeaderSection(
-                    onPressQrcode = onPressQrcode,
-                    onPressMyPage = onPressMyInfo
-                )
-            }
-            item {
-                Spacer(Modifier.height(20.dp))
-                BodySection()
-            }
-            items(schedules) { schedule ->
-                ScheduleItem(schedule)
-                Spacer(Modifier.height(12.dp))
-            }
-        }*/
+@Composable
+private fun BodySection() {
+    Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+        DDDText(
+            text = stringResource(R.string.member_attendance_status, "김디디"),
+            color = DDD_WHITE,
+            textStyle = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        DDDText(
+            text = stringResource(R.string.member_activity_period, "2025.03.12 ~ 2025.08.12"),
+            color = DDD_NEUTRAL_GRAY_20,
+            textStyle = MaterialTheme.typography.bodySmall
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        DDDMemberSituation(attendanceCount = 8, tardyCount = 2, absentCount = 1)
+
+        Spacer(Modifier.height(56.dp))
+
+        DDDText(
+            text = stringResource(R.string.member_th_schedule, "12"),
+            color = DDD_WHITE,
+            textStyle = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium
+        )
+
+        Spacer(Modifier.height(16.dp))
+    }
 }
 
 @Composable
