@@ -64,7 +64,6 @@ fun MemberScreen(
             onBackClicked = {}
         )
     }
-
 }
 
 @Composable
