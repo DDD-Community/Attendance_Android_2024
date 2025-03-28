@@ -20,14 +20,11 @@ import javax.inject.Inject
 @HiltViewModel
 class MemberViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val memberAttendanceUseCase: GetMemberAttendanceUseCase
+    private val memberAttendanceUseCase: GetMemberAttendanceUseCase,
 ) : ViewModel() {
+
     private val _isPermissionRequested = MutableStateFlow(false)
     val isPermissionRequested: StateFlow<Boolean> = _isPermissionRequested
-
-    fun permissionRequested(value: Boolean) {
-        _isPermissionRequested.value = value
-    }
 
     private val _memberId = MutableStateFlow(savedStateHandle["member"] ?: "")
 
@@ -52,7 +49,7 @@ class MemberViewModel @Inject constructor(
             MemberAttendanceUiState.Loading
         )
 
-    fun updateMemberId(newId: String) {
-        _memberId.value = newId
+    fun permissionRequested(value: Boolean) {
+        _isPermissionRequested.value = value
     }
 }
