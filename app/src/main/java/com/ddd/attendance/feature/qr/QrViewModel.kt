@@ -29,7 +29,7 @@ class QrViewModel @Inject constructor(
     private val _isPermissionRequested = MutableStateFlow(false)
     val isPermissionRequested: StateFlow<Boolean> = _isPermissionRequested
 
-    fun permissionRequested(value: Boolean) {
+    fun setPermissionRequested(value: Boolean) {
         _isPermissionRequested.value = value
     }
 

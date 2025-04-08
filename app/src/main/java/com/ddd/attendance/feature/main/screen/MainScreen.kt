@@ -12,6 +12,7 @@ import com.ddd.attendance.feature.admin.screen.AdminScreen
 import com.ddd.attendance.feature.main.MainViewModel
 import com.ddd.attendance.feature.member.screen.MemberScreen
 import com.ddd.attendance.feature.qr.screen.QrImageScreen
+import com.ddd.attendance.feature.qr.screen.QrScanScreen
 
 @Composable
 fun MainScreen() {
@@ -41,10 +42,16 @@ fun MainScreen() {
                     navController = navController
                 )
             }
+
+            composable(route = ScreenName.QR_SCAN.name) {
+                QrScanScreen(
+                    navController = navController
+                )
+            }
         }
     }
 }
 
 enum class ScreenName {
-    MEMBER, ADMIN, NONE, QR_IMAGE
+    MEMBER, ADMIN, NONE, QR_IMAGE, QR_SCAN
 }
