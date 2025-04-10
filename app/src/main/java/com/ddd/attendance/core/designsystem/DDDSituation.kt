@@ -100,7 +100,7 @@ fun AttendanceStatusRow(
         Image(
             modifier = Modifier.constrainAs(logo) {
                 top.linkTo(parent.top, margin = 4.dp)
-                start.linkTo(parent.start)
+                start.linkTo(parent.start, margin = 16.dp)
             },
             painter = painterResource(R.drawable.ic_44_logo_black),
             contentDescription = "Arrow Icon"
@@ -111,7 +111,7 @@ fun AttendanceStatusRow(
                 .noRippleClickable(onClick = onPressQrcode)
                 .constrainAs(qrCode) {
                     top.linkTo(parent.top, margin = 8.dp)
-                    end.linkTo(myInfo.start, margin = 4.dp)
+                    end.linkTo(myInfo.start, margin = 12.dp)
                 },
             painter = painterResource(R.drawable.ic_36_qr_code),
             contentDescription = "Arrow Icon"

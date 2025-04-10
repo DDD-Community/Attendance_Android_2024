@@ -1,6 +1,5 @@
 package com.ddd.attendance.feature.member.screen
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,7 +55,7 @@ fun MemberScreen(
     ) {
         Content(
             onPressQrcode = {
-                navController.navigate(ScreenName.QR_SCAN.name)
+                navController.navigate(ScreenName.QR_IMAGE.name)
             },
             onPressMyInfo = {
 
@@ -72,8 +71,6 @@ private fun Content(
     onPressQrcode: () -> Unit,
     onBackClicked: () -> Unit
 ) {
-    BackHandler { onBackClicked() }
-
     val schedules = getSchedules()
 
     Box(
