@@ -11,6 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import com.ddd.attendance.feature.admin.screen.AdminScreen
 import com.ddd.attendance.feature.main.MainViewModel
 import com.ddd.attendance.feature.member.screen.MemberScreen
+import com.ddd.attendance.feature.qr.screen.QrImageScreen
+import com.ddd.attendance.feature.qr.screen.QrScanScreen
 
 @Composable
 fun MainScreen() {
@@ -29,8 +31,20 @@ fun MainScreen() {
                     navController = navController
                 )
             }
+            composable(route = ScreenName.QR_IMAGE.name) {
+                QrImageScreen(
+                    navController = navController
+                )
+            }
+
             composable(route = ScreenName.ADMIN.name) {
                 AdminScreen(
+                    navController = navController
+                )
+            }
+
+            composable(route = ScreenName.QR_SCAN.name) {
+                QrScanScreen(
                     navController = navController
                 )
             }
@@ -39,5 +53,5 @@ fun MainScreen() {
 }
 
 enum class ScreenName {
-    MEMBER, ADMIN, NONE
+    MEMBER, ADMIN, NONE, QR_IMAGE, QR_SCAN
 }

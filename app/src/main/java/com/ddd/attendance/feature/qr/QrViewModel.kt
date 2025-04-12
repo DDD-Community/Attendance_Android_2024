@@ -26,6 +26,13 @@ class QrViewModel @Inject constructor(
     private val _qrScanUiState = MutableStateFlow<QrScanUiState>(QrScanUiState.Loading)
     val qrScanUiState: StateFlow<QrScanUiState> = _qrScanUiState.asStateFlow()
 
+    private val _isPermissionRequested = MutableStateFlow(false)
+    val isPermissionRequested: StateFlow<Boolean> = _isPermissionRequested
+
+    fun setPermissionRequested(value: Boolean) {
+        _isPermissionRequested.value = value
+    }
+
     fun generateQr(userId: String) {
         viewModelScope.launch {
             _qrGenerateUiState.value = QrGenerateUiState.Loading

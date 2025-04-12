@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -18,14 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.ddd.attendance.R
 import com.ddd.attendance.core.ui.theme.DDD_ERROR
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_20
@@ -90,33 +88,55 @@ fun DDDMemberSituation(
 fun AttendanceStatusRow(
     modifier: Modifier = Modifier,
     onPressQrcode:() -> Unit,
-    onPressMyPage:() -> Unit
+    onPressMyInfo:() -> Unit
 ) {
-    Row(
+    ConstraintLayout(
         modifier = modifier
             .fillMaxWidth()
-            .height(52.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(top = 36.dp)
     ) {
+        val (logo, qrCode, myInfo, tooltip) = createRefs()
+
         Image(
+            modifier = Modifier.constrainAs(logo) {
+                top.linkTo(parent.top, margin = 4.dp)
+                start.linkTo(parent.start, margin = 16.dp)
+            },
             painter = painterResource(R.drawable.ic_44_logo_black),
             contentDescription = "Arrow Icon"
         )
 
-        Spacer(modifier = Modifier.weight(1F))
-
         Image(
-            modifier = Modifier.noRippleClickable(onClick = onPressQrcode),
+            modifier = Modifier
+                .noRippleClickable(onClick = onPressQrcode)
+                .constrainAs(qrCode) {
+                    top.linkTo(parent.top, margin = 8.dp)
+                    end.linkTo(myInfo.start, margin = 12.dp)
+                },
             painter = painterResource(R.drawable.ic_36_qr_code),
             contentDescription = "Arrow Icon"
         )
 
-        Spacer(modifier = Modifier.width(12.dp))
-
         Image(
-            modifier = Modifier.noRippleClickable(onClick = onPressMyPage),
+            modifier = Modifier
+                .noRippleClickable(onClick = onPressMyInfo)
+                .constrainAs(myInfo) {
+                    top.linkTo(parent.top, margin = 8.dp)
+                    end.linkTo(parent.end, margin = 20.dp)
+                },
             painter = painterResource(R.drawable.ic_36_my_info),
             contentDescription = "Arrow Icon"
+        )
+
+        DDDToolTip(
+            modifier = Modifier
+                .fillMaxWidth()
+                .constrainAs(tooltip) {
+                    start.linkTo(qrCode.start)
+                    end.linkTo(qrCode.end)
+                    top.linkTo(qrCode.bottom, margin = 8.dp)
+                },
+            text = "QR스캔으로 출석하세요"
         )
     }
 }
@@ -149,58 +169,12 @@ fun DDDMemberSituationItem(
     }
 }
 
-@Composable
-fun DDDAdminSituationItem(
-    modifier: Modifier = Modifier,
-    text: String,
-    icon: Painter
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(DDD_NEUTRAL_GRAY_80),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(vertical = 16.dp, horizontal = 20.dp)
-        ) {
-            Row (modifier = Modifier,
-                verticalAlignment = Alignment.CenterVertically) {
-                DDDText(
-                    text = text,
-                    color = DDD_WHITE,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-
-                Spacer(Modifier.width(12.dp))
-
-                Image(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(R.drawable.ic_login_logo),
-                    contentDescription = "Arrow Icon"
-                )
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            Image(
-                modifier = Modifier.align(Alignment.End),
-                painter = icon,
-                contentDescription = "Arrow Icon",
-            )
-        }
-
-    }
-}
-
 @Preview(name = "공통 카드 타이틀")
 @Composable
 private fun P1() {
     AttendanceStatusRow(
         onPressQrcode = {},
-        onPressMyPage = {}
+        onPressMyInfo = {}
     )
 }
 
