@@ -1,5 +1,7 @@
 package com.ddd.attendance.feature.admin.screen
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,12 +21,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ddd.attendance.R
 import com.ddd.attendance.core.designsystem.DDDMemberSituation
 import com.ddd.attendance.core.designsystem.DDDText
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
@@ -32,6 +36,7 @@ import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_20
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_90
 import com.ddd.attendance.core.ui.theme.DDD_TEXT_DISABLED
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
+import com.ddd.attendance.core.utils.noRippleClickable
 import com.ddd.attendance.feature.admin.AdminViewModel
 
 @Composable
@@ -50,33 +55,37 @@ fun AdminScreen(
 private fun Content(
     onClickBackButton: () -> Unit,
 ) {
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(DDD_BLACK)
     ) {
-        item {
-            Header()
-            Spacer(modifier = Modifier.height(24.dp))
-            TeamStatus()
-        }
-
-        item {
-            TeamList(
-                teams = listOf(
-                    "Web 1팀",
-                    "Web 2팀",
-                    "iOS 1팀",
-                    "iOS 2팀",
-                    "Android 1팀",
-                    "Android 2팀",
+        Header()
+        LazyColumn {
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                TeamStatus()
+                TeamList(
+                    teams = listOf(
+                        "Web 1팀",
+                        "Web 2팀",
+                        "iOS 1팀",
+                        "iOS 2팀",
+                        "Android 1팀",
+                        "Android 2팀",
+                    )
                 )
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-        }
+                Spacer(modifier = Modifier.height(20.dp))
+            }
 
-        items(items = listOf("김디디", "김디디")) {
-            Member(member = it)
+            items(items = listOf("김디디", "김디디", "김디디", "김디디", "김디디", "김디디", "김디디", "김디디", "김디디", "김디디", "김디디", "김디디")) {
+                MemberCard(
+                    member = it,
+                    team = "Web1",
+                    major = "Designer",
+                    attendanceStatus = "출석"
+                )
+            }
         }
     }
 }
@@ -86,7 +95,8 @@ private fun Header(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 24.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = "출석",
@@ -94,6 +104,20 @@ private fun Header(modifier: Modifier = Modifier) {
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp
         )
+
+        Row {
+            Image(
+                modifier = Modifier.noRippleClickable(onClick = /*onPressQrcode*/{}),
+                painter = painterResource(R.drawable.ic_36_qr_code),
+                contentDescription = "Qr Icon"
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Image(
+                modifier = Modifier.noRippleClickable(onClick = /*onPressMyInfo*/{}),
+                painter = painterResource(R.drawable.ic_36_my_info),
+                contentDescription = "Info Icon"
+            )
+        }
     }
 }
 
@@ -150,9 +174,12 @@ private fun TeamList(
 }
 
 @Composable
-private fun Member(
+private fun MemberCard(
     modifier: Modifier = Modifier,
     member: String,
+    team: String,
+    major: String,
+    attendanceStatus: String
 ) {
     Row(
         modifier = modifier
@@ -175,13 +202,13 @@ private fun Member(
             )
             Row {
                 Text(
-                    text = "Web1 / ",
+                    text = "$team / ",
                     color = DDD_NEUTRAL_GRAY_20,
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
                 )
                 Text(
-                    text = "Designer",
+                    text = major,
                     color = DDD_TEXT_DISABLED,
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
@@ -190,7 +217,7 @@ private fun Member(
         }
         Row(modifier = Modifier.align(Alignment.CenterVertically)) {
             Text(
-                text = "출석",
+                text = attendanceStatus,
                 color = DDD_WHITE,
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp
@@ -221,3 +248,13 @@ private fun P2() {
     )
 }
 
+@Preview
+@Composable
+private fun P3() {
+    MemberCard(
+        member = "김디디",
+        team = "Web1",
+        major = "Designer",
+        attendanceStatus = "출석"
+    )
+}
