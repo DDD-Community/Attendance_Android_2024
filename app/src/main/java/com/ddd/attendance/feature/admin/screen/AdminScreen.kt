@@ -70,7 +70,7 @@ private fun Content(
             }
 
             "일정" -> {
-
+                ScheduleScreen()
             }
 
             else -> {}
