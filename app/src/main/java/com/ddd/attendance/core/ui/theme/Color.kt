@@ -39,3 +39,4 @@ val DDD_GRAY_F5 = Color(color = 0xFFF5F5F5)
 
 val DDD_TEXT_PRIMARY = Color(color = 0xFF202325)
 val DDD_TEXT_SECONDARY = Color(color = 0xFF525252)
+val DDD_TEXT_DISABLED = Color(color=  0xFFC6C6C6)
