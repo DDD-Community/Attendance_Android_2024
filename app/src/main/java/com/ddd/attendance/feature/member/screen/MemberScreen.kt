@@ -54,12 +54,8 @@ fun MemberScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         Content(
-            onPressQrcode = {
-                navController.navigate(ScreenName.QR_IMAGE.name)
-            },
-            onPressMyInfo = {
-
-            },
+            onPressQrcode = { navController.navigate(ScreenName.QR_IMAGE.name) },
+            onPressMyInfo = { navController.navigate(ScreenName.MY_PAGE.name) },
             onBackClicked = {}
         )
     }

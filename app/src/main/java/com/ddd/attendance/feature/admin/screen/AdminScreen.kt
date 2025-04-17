@@ -43,7 +43,7 @@ fun AdminScreen(
     Content(
         menu = menu,
         changeMenu = viewModel::setMenu,
-        onClickBackButton = {
+        onBackClicked = {
             navController.popBackStack()
         },
     )
@@ -53,7 +53,7 @@ fun AdminScreen(
 private fun Content(
     menu: String,
     changeMenu: (String) -> Unit,
-    onClickBackButton: () -> Unit,
+    onBackClicked: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -143,6 +143,6 @@ private fun P1() {
     Content(
         menu = "출석",
         changeMenu = {},
-        onClickBackButton = {},
+        onBackClicked = {},
     )
 }

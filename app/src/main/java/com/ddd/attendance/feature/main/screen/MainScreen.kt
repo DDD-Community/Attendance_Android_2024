@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ddd.attendance.feature.admin.screen.AdminScreen
 import com.ddd.attendance.feature.main.MainViewModel
 import com.ddd.attendance.feature.member.screen.MemberScreen
+import com.ddd.attendance.feature.mypage.screen.MyPageScreen
 import com.ddd.attendance.feature.qr.screen.QrImageScreen
 import com.ddd.attendance.feature.qr.screen.QrScanScreen
 
@@ -48,10 +49,16 @@ fun MainScreen() {
                     navController = navController
                 )
             }
+
+            composable(route = ScreenName.MY_PAGE.name) {
+                MyPageScreen(
+                    navController = navController
+                )
+            }
         }
     }
 }
 
 enum class ScreenName {
-    MEMBER, ADMIN, NONE, QR_IMAGE, QR_SCAN
+    MEMBER, ADMIN, NONE, QR_IMAGE, QR_SCAN, MY_PAGE
 }

@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ddd.attendance.core.domain.usecase.QrDecodeUseCase
 import com.ddd.attendance.core.domain.usecase.QrEncodeUseCase
-import com.ddd.attendance.core.model.qr.QrGenerateUiState
-import com.ddd.attendance.core.model.qr.QrScanUiState
+import com.ddd.attendance.feature.qr.model.QrGenerateUiState
+import com.ddd.attendance.feature.qr.model.QrScanUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
