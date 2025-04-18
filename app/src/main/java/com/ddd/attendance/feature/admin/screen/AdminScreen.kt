@@ -32,6 +32,7 @@ import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
 import com.ddd.attendance.core.utils.noRippleClickable
 import com.ddd.attendance.feature.admin.AdminViewModel
+import com.ddd.attendance.feature.main.screen.ScreenName
 
 @Composable
 fun AdminScreen(
@@ -46,6 +47,9 @@ fun AdminScreen(
         onClickBackButton = {
             navController.popBackStack()
         },
+        onClickFloatingButton = {
+            navController.navigate(route = ScreenName.ADD_SCHEDULE.name)
+        }
     )
 }
 
@@ -54,6 +58,7 @@ private fun Content(
     menu: String,
     changeMenu: (String) -> Unit,
     onClickBackButton: () -> Unit,
+    onClickFloatingButton: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -70,7 +75,7 @@ private fun Content(
             }
 
             "일정" -> {
-                ScheduleScreen()
+                ScheduleScreen(onClickFloatingButton = onClickFloatingButton)
             }
 
             else -> {}
@@ -144,5 +149,6 @@ private fun P1() {
         menu = "출석",
         changeMenu = {},
         onClickBackButton = {},
+        onClickFloatingButton = {},
     )
 }

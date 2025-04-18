@@ -34,7 +34,10 @@ import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_90
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
 
 @Composable
-fun ScheduleScreen(modifier: Modifier = Modifier) {
+fun ScheduleScreen(
+    modifier: Modifier = Modifier,
+    onClickFloatingButton: () -> Unit,
+) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -50,7 +53,8 @@ fun ScheduleScreen(modifier: Modifier = Modifier) {
                 .padding(bottom = 20.dp)
                 .size(64.dp)
                 .background(color = DDD_NEUTRAL_BLUE_40, shape = CircleShape),
-            onClick = {}) {
+            onClick = onClickFloatingButton
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_40_add),
                 contentDescription = "",
@@ -159,5 +163,8 @@ private fun P2() {
 @Composable
 @Preview
 private fun P3() {
-    ScheduleScreen(modifier = Modifier.background(DDD_BLACK))
+    ScheduleScreen(
+        modifier = Modifier.background(DDD_BLACK),
+        onClickFloatingButton = {}
+    )
 }
