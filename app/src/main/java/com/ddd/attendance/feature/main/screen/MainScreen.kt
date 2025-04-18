@@ -8,6 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ddd.attendance.feature.admin.screen.AddScheduleScreen
 import com.ddd.attendance.feature.admin.screen.AdminScreen
 import com.ddd.attendance.feature.main.MainViewModel
 import com.ddd.attendance.feature.member.screen.MemberScreen
@@ -55,10 +56,16 @@ fun MainScreen() {
                     navController = navController
                 )
             }
+
+            composable(route = ScreenName.ADD_SCHEDULE.name) {
+                AddScheduleScreen(
+                    navController = navController
+                )
+            }
         }
     }
 }
 
 enum class ScreenName {
-    MEMBER, ADMIN, NONE, QR_IMAGE, QR_SCAN, MY_PAGE
+    MEMBER, ADMIN, NONE, QR_IMAGE, QR_SCAN, MY_PAGE, ADD_SCHEDULE
 }
