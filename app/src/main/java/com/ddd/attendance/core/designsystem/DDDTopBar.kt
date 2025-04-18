@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ddd.attendance.R
 import com.ddd.attendance.core.ui.theme.DDD_400
+import com.ddd.attendance.core.ui.theme.DDD_WHITE
 
 @Composable
 fun DDDTopBar(
@@ -32,6 +35,7 @@ fun DDDTopBar(
     onClickLeftImage: () -> Unit = {},
     onClickRightImage: () -> Unit = {},
     onClickRightText: () -> Unit = {},
+    colorFilter: ColorFilter? = null,
     center: @Composable (Modifier) -> Unit = {}
 ) {
     when (type) {
@@ -66,6 +70,13 @@ fun DDDTopBar(
         TopBarType.IMAGE -> NonBackButtonTopBar(
             drawableResourceList = drawableResourceList,
             modifier = modifier
+        )
+
+        TopBarType.LEFT_IMAGE_WEIGHT_RIGHT_IMAGE -> DDDBasicTopBar(
+            modifier = modifier,
+            colorFilter = colorFilter,
+            onClickLeftImage = onClickLeftImage,
+            onClickRightImage = onClickRightImage
         )
     }
 }
@@ -170,11 +181,45 @@ private fun TextTopBar(
     }
 }
 
+@Composable
+private fun DDDBasicTopBar(
+    modifier: Modifier = Modifier,
+    colorFilter: ColorFilter? = null,
+    onClickLeftImage: () -> Unit = {},
+    onClickRightImage: () -> Unit = {}
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(height = 56.dp)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_40_back),
+            contentDescription = null,
+            modifier = Modifier
+                .clickable(onClick = onClickLeftImage),
+            colorFilter = colorFilter
+        )
+
+        Spacer(modifier = Modifier.weight(1F))
+
+        Image(
+            painter = painterResource(id = R.drawable.ic_24_info),
+            contentDescription = null,
+            modifier = Modifier
+                .clickable(onClick = onClickRightImage)
+        )
+    }
+}
+
 enum class TopBarType {
     LEFT_IMAGE,
     LEFT_RIGHT_IMAGE,
     LEFT_IMAGE_RIGHT_TEXT,
     LEFT_IMAGE_CENTER,
+    LEFT_IMAGE_WEIGHT_RIGHT_IMAGE,
     IMAGE
 }
 

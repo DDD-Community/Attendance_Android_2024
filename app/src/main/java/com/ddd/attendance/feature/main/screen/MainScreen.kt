@@ -12,6 +12,7 @@ import com.ddd.attendance.feature.admin.screen.AddScheduleScreen
 import com.ddd.attendance.feature.admin.screen.AdminScreen
 import com.ddd.attendance.feature.main.MainViewModel
 import com.ddd.attendance.feature.member.screen.MemberScreen
+import com.ddd.attendance.feature.mypage.screen.MyPageScreen
 import com.ddd.attendance.feature.qr.screen.QrImageScreen
 import com.ddd.attendance.feature.qr.screen.QrScanScreen
 
@@ -50,6 +51,12 @@ fun MainScreen() {
                 )
             }
 
+            composable(route = ScreenName.MY_PAGE.name) {
+                MyPageScreen(
+                    navController = navController
+                )
+            }
+
             composable(route = ScreenName.ADD_SCHEDULE.name) {
                 AddScheduleScreen(
                     navController = navController
@@ -60,5 +67,5 @@ fun MainScreen() {
 }
 
 enum class ScreenName {
-    MEMBER, ADMIN, NONE, QR_IMAGE, QR_SCAN, ADD_SCHEDULE
+    MEMBER, ADMIN, NONE, QR_IMAGE, QR_SCAN, MY_PAGE, ADD_SCHEDULE
 }

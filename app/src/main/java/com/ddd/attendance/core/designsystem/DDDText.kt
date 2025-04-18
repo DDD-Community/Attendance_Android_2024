@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.TextUnit
 
 @Composable
@@ -19,6 +20,7 @@ fun DDDText(
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     textAlign: TextAlign? = null,
+    textDecoration: TextDecoration = TextDecoration.None
 ) {
     Text(
         text = text,
@@ -27,6 +29,7 @@ fun DDDText(
         color = color,
         fontSize = fontSize,
         fontWeight = fontWeight,
-        textAlign = textAlign
+        textAlign = textAlign,
+        textDecoration = textDecoration
     )
 }

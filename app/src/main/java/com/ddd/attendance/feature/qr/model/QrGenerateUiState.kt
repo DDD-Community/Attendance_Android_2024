@@ -1,4 +1,4 @@
-package com.ddd.attendance.core.model.qr
+package com.ddd.attendance.feature.qr.model
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
