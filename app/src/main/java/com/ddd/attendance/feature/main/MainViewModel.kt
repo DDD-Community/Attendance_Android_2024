@@ -28,6 +28,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun getDummyLoginMethodAsync(): String {
-        return "member"
+        // return "member"
+        return "admin"
     }
 }

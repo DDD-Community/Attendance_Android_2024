@@ -41,6 +41,8 @@ fun AdminScreen(
 ) {
     val menu by viewModel.menu.collectAsStateWithLifecycle()
 
+    val scheduleUiState = viewModel.scheduleUiState.collectAsStateWithLifecycle()
+
     Content(
         menu = menu,
         changeMenu = viewModel::setMenu,

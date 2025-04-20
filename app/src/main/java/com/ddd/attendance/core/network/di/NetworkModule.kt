@@ -6,6 +6,7 @@ import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.ddd.attendance.BuildConfig
 import com.ddd.attendance.core.network.service.MemberApiService
 import com.ddd.attendance.core.network.service.QrApiService
+import com.ddd.attendance.core.network.service.ScheduleApiService
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -42,7 +43,7 @@ object NetworkModule {
         gsonConverterFactory: GsonConverterFactory,
     ): Retrofit = Retrofit.Builder()
         .client(okHttpClient)
-        .baseUrl("https://localhost:8000/v1/")
+        .baseUrl("https://home.ufxpri.dev")
         .addConverterFactory(gsonConverterFactory)
         .build()
 
@@ -103,6 +104,12 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideMemberApiService(retrofit: Retrofit): MemberApiService {
+        return retrofit.create()
+    }
+
+    @Provides
+    @Singleton
+    fun provideScheduleApiService(retrofit: Retrofit): ScheduleApiService {
         return retrofit.create()
     }
 }
