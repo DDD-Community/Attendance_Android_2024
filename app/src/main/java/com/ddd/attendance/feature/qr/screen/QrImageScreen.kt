@@ -44,7 +44,7 @@ fun QrImageScreen(
         DDDTopBar(
             type = TopBarType.LEFT_IMAGE,
             onClickLeftImage = {
-                navController.navigate(ScreenName.MEMBER.name)
+                navController.popBackStack()
             },
         )
         Content()

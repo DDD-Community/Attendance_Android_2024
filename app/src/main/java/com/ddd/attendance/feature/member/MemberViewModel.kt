@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ddd.attendance.core.domain.usecase.GetMemberAttendanceUseCase
-import com.ddd.attendance.core.model.member.MemberAttendanceUiState
+import com.ddd.attendance.feature.member.model.MemberAttendanceUiState
 import com.ddd.attendance.core.utils.default
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
