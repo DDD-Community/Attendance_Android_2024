@@ -17,7 +17,9 @@ import com.ddd.attendance.feature.login.screen.login.LoginScreen
 import com.ddd.attendance.feature.login.screen.name.NameScreen
 
 @Composable
-fun LoginProcessScreen() {
+fun LoginProcessScreen(
+    onClickGoogle:() -> Unit,
+) {
     val navController = rememberNavController()
     val viewModel: LoginProcessViewModel = hiltViewModel()
 
@@ -33,7 +35,8 @@ fun LoginProcessScreen() {
             composable(route = ScreenName.LOGIN.name) {
                 LoginScreen(
                     navController = navController,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    onClickGoogle = onClickGoogle
                 )
             }
             composable(route = ScreenName.INVITATION_CODE.name) {

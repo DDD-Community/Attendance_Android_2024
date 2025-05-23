@@ -1,5 +1,6 @@
 package com.ddd.attendance.feature.login.screen.login
 
+import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,16 +23,22 @@ import com.ddd.attendance.core.ui.theme.DDD_300
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.feature.login.LoginProcessViewModel
 import com.ddd.attendance.feature.login.ScreenName
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 @Composable
 fun LoginScreen(
     navController: NavController,
     viewModel: LoginProcessViewModel,
+    onClickGoogle: () -> Unit
 ) {
+    val context = LocalContext.current
+
     Content(
         onClickGoogle = {
-            viewModel.onClickGoogleLogin()
-            navController.navigate(route = ScreenName.INVITATION_CODE.name)
+            onClickGoogle()
+            /*viewModel.onClickGoogleLogin()
+            navController.navigate(route = ScreenName.INVITATION_CODE.name)*/
         }
     )
 }
