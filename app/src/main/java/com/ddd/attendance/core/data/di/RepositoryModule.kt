@@ -1,11 +1,8 @@
 package com.ddd.attendance.core.data.di
 
-import com.ddd.attendance.core.data.repository.DefaultMemberRepository
-import com.ddd.attendance.core.data.repository.DefaultQrRepository
-import com.ddd.attendance.core.domain.repository.MemberRepository
-import com.ddd.attendance.core.domain.repository.QrRepository
-import com.ddd.attendance.core.network.service.MemberApiService
-import com.ddd.attendance.core.network.service.QrApiService
+import com.ddd.attendance.core.data.api.AccountsApi
+import com.ddd.attendance.core.data.repository.DefaultRegistrationRepository
+import com.ddd.attendance.core.network.RegistrationRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,9 +14,5 @@ import javax.inject.Singleton
 object RepositoryModule {
     @Provides
     @Singleton
-    fun provideQrRepository(api: QrApiService): QrRepository = DefaultQrRepository(api)
-
-    @Provides
-    @Singleton
-    fun provideMemberRepository(api: MemberApiService): MemberRepository = DefaultMemberRepository(api)
+    fun provideRegistrationRepository(api: AccountsApi): RegistrationRepository = DefaultRegistrationRepository(api)
 }

@@ -4,9 +4,13 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ddd.attendance.core.model.login.GoogleLogin
 import com.ddd.attendance.core.ui.theme.AttendanceTheme
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -18,65 +22,95 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @AndroidEntryPoint
 class LoginProcessActivity : ComponentActivity() {
-    private val TAG = "LoginProcessActivity"
+
+    companion object {
+        private const val TAG = "LoginProcessActivity"
+        private const val CLIENT_ID = "369957721624-ajhu5s3msc9jbhsrjgp561lpghaik9ji.apps.googleusercontent.com"
+    }
+
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
+
+    private val googleLogin = MutableStateFlow(GoogleLogin())
 
     private val googleLoginLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                account?.idToken?.let { idToken ->
-                    Log.d(TAG, idToken)
-                    // TODO: ViewModel 예정
-                    handleGoogleIdToken(idToken = idToken)
-                }
-            } catch (e: ApiException) {
-                Log.d(TAG, "Google Sign-In failed ${e.message}")
-            }
-        }
+        handleSignInResult(result)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .requestIdToken("369957721624-ajhu5s3msc9jbhsrjgp561lpghaik9ji.apps.googleusercontent.com")
-            .build()
 
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-        auth = Firebase.auth
+        initGoogleSignIn()
+        initFirebaseAuth()
+        setupWindow()
 
-
-        window.statusBarColor = DDD_BLACK.toArgb()
-        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = false
         setContent {
+            val userInfo by googleLogin.collectAsStateWithLifecycle()
+
             AttendanceTheme {
                 LoginProcessScreen(
-                    onClickGoogle = {
-                        val signInIntent = googleSignInClient.signInIntent
-                        googleLoginLauncher.launch(signInIntent)
-                    }
+                    userInfo = userInfo,
+                    onClickGoogle = { launchGoogleSignIn() }
                 )
             }
         }
     }
 
+    private fun initGoogleSignIn() {
+        val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestIdToken(CLIENT_ID)
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(this, options)
+    }
+
+    private fun initFirebaseAuth() {
+        auth = Firebase.auth
+    }
+
+    private fun setupWindow() {
+        window.statusBarColor = DDD_BLACK.toArgb()
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = false
+    }
+
+    private fun launchGoogleSignIn() {
+        googleLoginLauncher.launch(googleSignInClient.signInIntent)
+    }
+
+    private fun handleSignInResult(result: ActivityResult) {
+        if (result.resultCode != RESULT_OK) return
+
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            account?.idToken?.let { handleGoogleIdToken(it) }
+        } catch (e: ApiException) {
+            Log.e(TAG, "Google Sign-In failed: ${e.message}", e)
+        }
+    }
+
     private fun handleGoogleIdToken(idToken: String) {
-        val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(firebaseCredential)
-            .addOnCompleteListener(this) {
-                if(it.isSuccessful) {
-                    // 정상 완료
-                    Log.d(TAG, "로그인 성공, ${it.result.user?.uid}")
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val user = task.result.user
+
+                    Log.i(TAG, "구글 로그인 성공: ${user?.email}, ${user?.displayName}, ${user?.uid}")
+
+                    googleLogin.value = GoogleLogin(
+                        email = user?.email.orEmpty(),
+                        displayName = user?.displayName.orEmpty(),
+                        uid = user?.uid.orEmpty()
+                    )
                 } else {
-                    Log.d(TAG, "로그인 실패, ${it.exception?.message}")
+                    Log.e(TAG, "구글 로그인 실패: ${task.exception?.message}", task.exception)
                 }
             }
     }

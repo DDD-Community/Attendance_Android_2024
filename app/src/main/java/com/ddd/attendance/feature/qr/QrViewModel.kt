@@ -2,23 +2,17 @@ package com.ddd.attendance.feature.qr
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.ddd.attendance.core.domain.usecase.QrDecodeUseCase
-import com.ddd.attendance.core.domain.usecase.QrEncodeUseCase
 import com.ddd.attendance.feature.qr.model.QrGenerateUiState
 import com.ddd.attendance.feature.qr.model.QrScanUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class QrViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val qrEncodeUseCase: QrEncodeUseCase,
-    private val qrDecodeUseCase: QrDecodeUseCase
 ) : ViewModel() {
     private val _qrGenerateUiState = MutableStateFlow<QrGenerateUiState>(QrGenerateUiState.Loading)
     val qrGenerateUiState: StateFlow<QrGenerateUiState> = _qrGenerateUiState.asStateFlow()
@@ -33,7 +27,7 @@ class QrViewModel @Inject constructor(
         _isPermissionRequested.value = value
     }
 
-    fun generateQr(userId: String) {
+    /*fun generateQr(userId: String) {
         viewModelScope.launch {
             _qrGenerateUiState.value = QrGenerateUiState.Loading
             try {
@@ -64,5 +58,5 @@ class QrViewModel @Inject constructor(
                 _qrScanUiState.value = QrScanUiState.Error(e.message ?: "알 수 없는 오류 발생")
             }
         }
-    }
+    }*/
 }
