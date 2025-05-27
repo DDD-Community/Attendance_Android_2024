@@ -1,6 +1,6 @@
 package com.ddd.attendance.core.model.login
 
-import com.ddd.attendance.core.data.api.model.RegistrationUserResponse
+import com.ddd.attendance.core.data.api.model.accounts.RegistrationUserResponse
 
 data class RegistrationUser(
     val id: String,

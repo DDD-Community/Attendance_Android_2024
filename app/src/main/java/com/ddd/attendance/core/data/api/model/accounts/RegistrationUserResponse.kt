@@ -1,4 +1,4 @@
-package com.ddd.attendance.core.data.api.model
+package com.ddd.attendance.core.data.api.model.accounts
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

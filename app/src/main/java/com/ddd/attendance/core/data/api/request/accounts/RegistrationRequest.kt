@@ -1,4 +1,4 @@
-package com.ddd.attendance.core.data.api.request
+package com.ddd.attendance.core.data.api.request.accounts
 
 data class RegistrationRequest(
     val owner: String,
