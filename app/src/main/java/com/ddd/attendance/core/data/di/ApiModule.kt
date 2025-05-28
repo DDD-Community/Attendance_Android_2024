@@ -5,6 +5,7 @@ import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.ddd.attendance.BuildConfig
 import com.ddd.attendance.core.data.api.AccountsApi
+import com.ddd.attendance.core.data.api.InvitesApi
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -96,6 +97,12 @@ object ApiModule {
     @Provides
     @Singleton
     fun provideAccountsApi(retrofit: Retrofit): AccountsApi {
+        return retrofit.create()
+    }
+
+    @Provides
+    @Singleton
+    fun provideInvitesApi(retrofit: Retrofit): InvitesApi {
         return retrofit.create()
     }
 }

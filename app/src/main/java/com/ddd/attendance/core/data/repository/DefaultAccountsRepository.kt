@@ -3,15 +3,15 @@ package com.ddd.attendance.core.data.repository
 import com.ddd.attendance.core.data.api.AccountsApi
 import com.ddd.attendance.core.data.api.model.accounts.RegistrationResponse
 import com.ddd.attendance.core.data.api.request.accounts.RegistrationRequest
-import com.ddd.attendance.core.model.login.Registration
-import com.ddd.attendance.core.network.RegistrationRepository
+import com.ddd.attendance.core.model.accounts.Registration
+import com.ddd.attendance.core.network.AccountsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class DefaultRegistrationRepository @Inject constructor(
+class DefaultAccountsRepository @Inject constructor(
     private val api: AccountsApi
-) : RegistrationRepository {
+) : AccountsRepository {
 
     override fun registration(
         owner: String,

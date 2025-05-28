@@ -1,4 +1,4 @@
-package com.ddd.attendance.core.model.login
+package com.ddd.attendance.core.model.accounts
 
 import com.ddd.attendance.core.data.api.model.accounts.RegistrationUserResponse
 

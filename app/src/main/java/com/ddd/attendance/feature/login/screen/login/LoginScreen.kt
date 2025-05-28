@@ -18,23 +18,26 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ddd.attendance.R
 import com.ddd.attendance.core.designsystem.DDDText
+import com.ddd.attendance.core.model.google.GoogleLogin
 import com.ddd.attendance.core.ui.theme.DDD_300
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.feature.login.LoginProcessViewModel
+import com.ddd.attendance.feature.login.ScreenName
 
 @Composable
 fun LoginScreen(
     navController: NavController,
     viewModel: LoginProcessViewModel,
-    onClickGoogle: () -> Unit
+    onClickGoogle: (result: (GoogleLogin) -> Unit) -> Unit
 ) {
     val context = LocalContext.current
 
     Content(
-        onClickGoogle = {
-            onClickGoogle()
-            /*viewModel.onClickGoogleLogin()
-            navController.navigate(route = ScreenName.INVITATION_CODE.name)*/
+        onClickGoogle = { // 로그인 성공 결과
+            onClickGoogle { result ->
+                viewModel.setGoogleLogin(result)
+                navController.navigate(route = ScreenName.INVITATION_CODE.name)
+            }
         }
     )
 }

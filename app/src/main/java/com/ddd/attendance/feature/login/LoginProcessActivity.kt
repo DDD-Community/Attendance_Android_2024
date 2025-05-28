@@ -6,11 +6,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ddd.attendance.core.model.login.GoogleLogin
+import com.ddd.attendance.core.model.google.GoogleLogin
 import com.ddd.attendance.core.ui.theme.AttendanceTheme
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -22,7 +20,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @AndroidEntryPoint
 class LoginProcessActivity : ComponentActivity() {
@@ -35,13 +32,14 @@ class LoginProcessActivity : ComponentActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
 
-    private val googleLogin = MutableStateFlow(GoogleLogin())
-
     private val googleLoginLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         handleSignInResult(result)
     }
+
+    // 로그인 요청시 바로바로 GoogleLogin 값을 수신하고 화면 전환을 위해서 만든 Callback
+    private var onGoogleLoginResult: ((GoogleLogin) -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,12 +49,12 @@ class LoginProcessActivity : ComponentActivity() {
         setupWindow()
 
         setContent {
-            val userInfo by googleLogin.collectAsStateWithLifecycle()
-
             AttendanceTheme {
                 LoginProcessScreen(
-                    userInfo = userInfo,
-                    onClickGoogle = { launchGoogleSignIn() }
+                    onClickGoogle = { onResult ->
+                        onGoogleLoginResult = onResult // 나중에 로그인 완료되면 호출할 콜백 저장
+                        launchGoogleSignIn()
+                    }
                 )
             }
         }
@@ -89,7 +87,9 @@ class LoginProcessActivity : ComponentActivity() {
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
             val account = task.getResult(ApiException::class.java)
-            account?.idToken?.let { handleGoogleIdToken(it) }
+            account?.idToken?.let {
+                handleGoogleIdToken(it)
+            }
         } catch (e: ApiException) {
             Log.e(TAG, "Google Sign-In failed: ${e.message}", e)
         }
@@ -101,16 +101,18 @@ class LoginProcessActivity : ComponentActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val user = task.result.user
-
-                    Log.i(TAG, "구글 로그인 성공: ${user?.email}, ${user?.displayName}, ${user?.uid}")
-
-                    googleLogin.value = GoogleLogin(
+                    val loginResult = GoogleLogin(
                         email = user?.email.orEmpty(),
                         displayName = user?.displayName.orEmpty(),
                         uid = user?.uid.orEmpty()
                     )
+
+                    Log.i(TAG, "구글 로그인 성공!")
+
+                    // 여기서 콜백 호출해서 화면에 결과 전달
+                    onGoogleLoginResult?.invoke(loginResult)
                 } else {
-                    Log.e(TAG, "구글 로그인 실패: ${task.exception?.message}", task.exception)
+                    Log.e(TAG, "구글 로그인 실패 !")
                 }
             }
     }

@@ -1,9 +1,7 @@
 package com.ddd.attendance.core.data.api.model.invites
 
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class ValidateDataResponse(
     @SerialName("valid") val valid: Boolean,
     @SerialName("invite_code_id") val inviteCodeId: String,

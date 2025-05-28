@@ -1,5 +1,7 @@
 package com.ddd.attendance.core.data.api.request.validate
 
+import com.google.gson.annotations.SerializedName
+
 data class ValidateRequest(
-    val inviteCode: String
+    @SerializedName("invite_code") val inviteCode: String
 )
