@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import com.ddd.attendance.core.model.accounts.google.GoogleLogin
@@ -32,6 +33,8 @@ class LoginProcessActivity : ComponentActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
 
+    private val snackBarMessage = mutableStateOf<String?>(null)
+
     private val googleLoginLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -54,7 +57,9 @@ class LoginProcessActivity : ComponentActivity() {
                     onClickGoogle = { onResult ->
                         onGoogleLoginResult = onResult // 나중에 로그인 완료되면 호출할 콜백 저장
                         launchGoogleSignIn()
-                    }
+                    },
+                    snackBarMessage = snackBarMessage.value,
+                    onDismissSnackBar = { snackBarMessage.value = null }
                 )
             }
         }
@@ -91,7 +96,7 @@ class LoginProcessActivity : ComponentActivity() {
                 handleGoogleIdToken(it)
             }
         } catch (e: ApiException) {
-            Log.e(TAG, "Google Sign-In failed: ${e.message}", e)
+            snackBarMessage.value = "Google Sign-In failed: ${e.message}"
         }
     }
 

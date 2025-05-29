@@ -19,7 +19,9 @@ import com.ddd.attendance.feature.login.screen.name.NameScreen
 
 @Composable
 fun LoginProcessScreen(
-    onClickGoogle: ((GoogleLogin) -> Unit) -> Unit
+    snackBarMessage: String?,
+    onDismissSnackBar: () -> Unit,
+    onClickGoogle: ((GoogleLogin) -> Unit) -> Unit,
 ) {
     val navController = rememberNavController()
     val viewModel: LoginProcessViewModel = hiltViewModel()
@@ -37,6 +39,8 @@ fun LoginProcessScreen(
                 LoginScreen(
                     navController = navController,
                     viewModel = viewModel,
+                    snackBarMessage = snackBarMessage,
+                    onDismissSnackBar = onDismissSnackBar,
                     onClickGoogle = onClickGoogle
                 )
             }
