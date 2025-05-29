@@ -8,7 +8,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
-import com.ddd.attendance.core.model.google.GoogleLogin
+import com.ddd.attendance.core.model.accounts.google.GoogleLogin
 import com.ddd.attendance.core.ui.theme.AttendanceTheme
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -101,14 +101,13 @@ class LoginProcessActivity : ComponentActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val user = task.result.user
+
                     val loginResult = GoogleLogin(
                         email = user?.email.orEmpty(),
-                        displayName = user?.displayName.orEmpty(),
+                        name = user?.displayName.orEmpty(),
                         uid = user?.uid.orEmpty()
                     )
-
                     Log.i(TAG, "구글 로그인 성공!")
-
                     // 여기서 콜백 호출해서 화면에 결과 전달
                     onGoogleLoginResult?.invoke(loginResult)
                 } else {

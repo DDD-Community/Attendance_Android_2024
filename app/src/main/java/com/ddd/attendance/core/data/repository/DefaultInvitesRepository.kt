@@ -12,7 +12,12 @@ class DefaultInvitesRepository @Inject constructor(
     private val api: InvitesApi
 ): InvitesRepository {
     override fun validate(inviteCode: String): Flow<Validate> = flow {
-        val response = api.validate(request = ValidateRequest(inviteCode = inviteCode))
+        val response = api.validate(
+            request = ValidateRequest(
+                inviteCode = inviteCode
+            )
+        )
+
         emit(Validate.from(response.data))
     }
 }

@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ddd.attendance.R
 import com.ddd.attendance.core.designsystem.DDDText
-import com.ddd.attendance.core.model.google.GoogleLogin
+import com.ddd.attendance.core.model.accounts.google.GoogleLogin
 import com.ddd.attendance.core.ui.theme.DDD_300
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.feature.login.LoginProcessViewModel
@@ -35,8 +35,8 @@ fun LoginScreen(
     Content(
         onClickGoogle = { // 로그인 성공 결과
             onClickGoogle { result ->
-                viewModel.setGoogleLogin(result)
-                navController.navigate(route = ScreenName.INVITATION_CODE.name)
+                viewModel.setUpdateUser(result) // 유저 정보 저장
+                navController.navigate(route = ScreenName.INVITATION_CODE.name) // 초대 코드 입력 화면으로 전환
             }
         }
     )

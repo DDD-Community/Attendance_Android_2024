@@ -1,6 +1,5 @@
 package com.ddd.attendance.feature.login.screen.invitationcode
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -57,7 +56,11 @@ fun InvitationCodeScreen(
 
     LaunchedEffect(validateUiState) {
         if (validateUiState is ValidateUiState.Success) {
-            Log.d("InvitationCodeScreen", (validateUiState as ValidateUiState.Success).data.toString())
+            val result = (validateUiState as ValidateUiState.Success).data
+            if (result.valid && result.inviteCodeId.isNotBlank()) {
+                navController.navigate(route = ScreenName.NAME.name) // 이름 입력 화면으로 전환
+                viewModel.resetValidateState() //상태 초기화
+            }
         }
     }
 
@@ -66,8 +69,7 @@ fun InvitationCodeScreen(
             navController.popBackStack()
         },
         onClickSignup = { value ->
-            viewModel.onClickSignup(value)
-            navController.navigate(route = ScreenName.NAME.name)
+            viewModel.inviteValidation(value)
         }
     )
 }

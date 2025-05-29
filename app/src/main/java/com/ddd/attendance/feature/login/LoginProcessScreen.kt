@@ -9,7 +9,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ddd.attendance.core.model.google.GoogleLogin
+import com.ddd.attendance.core.model.accounts.google.GoogleLogin
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.feature.login.screen.affiliation.AffiliationScreen
 import com.ddd.attendance.feature.login.screen.invitationcode.InvitationCodeScreen
