@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ddd.attendance.core.domain.usecase.accounts.GetAccessTokenUseCase
 import com.ddd.attendance.core.domain.usecase.accounts.RegistrationUseCase
 import com.ddd.attendance.core.domain.usecase.invites.ValidateUseCase
 import com.ddd.attendance.core.model.accounts.UserInfo
@@ -30,7 +31,8 @@ import javax.inject.Inject
 class LoginProcessViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val validateUseCase: ValidateUseCase,
-    private val registrationUseCase: RegistrationUseCase
+    private val registrationUseCase: RegistrationUseCase,
+    val getAccessTokenUseCase: GetAccessTokenUseCase
 ) : ViewModel() {
     private val _userInfo = MutableStateFlow(UserInfo())
     val userInfo: StateFlow<UserInfo> = _userInfo.asStateFlow()

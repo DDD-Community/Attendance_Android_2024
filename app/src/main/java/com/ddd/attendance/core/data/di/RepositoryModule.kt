@@ -4,6 +4,7 @@ import com.ddd.attendance.core.data.api.AccountsApi
 import com.ddd.attendance.core.data.api.InvitesApi
 import com.ddd.attendance.core.data.repository.DefaultAccountsRepository
 import com.ddd.attendance.core.data.repository.DefaultInvitesRepository
+import com.ddd.attendance.core.datastore.datasource.AccountPreferencesDataSource
 import com.ddd.attendance.core.network.AccountsRepository
 import com.ddd.attendance.core.network.InvitesRepository
 import dagger.Module
@@ -17,7 +18,10 @@ import javax.inject.Singleton
 object RepositoryModule {
     @Provides
     @Singleton
-    fun provideRegistrationRepository(api: AccountsApi): AccountsRepository = DefaultAccountsRepository(api)
+    fun provideRegistrationRepository(
+        api: AccountsApi,
+        dataStore: AccountPreferencesDataSource
+    ): AccountsRepository = DefaultAccountsRepository(api, dataStore)
 
     @Provides
     @Singleton

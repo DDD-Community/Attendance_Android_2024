@@ -28,6 +28,7 @@ firebase-bom = "32.8.0"
 firebase-auth-ktx = "23.0.0"
 play-services-auth = "21.0.0"
 google-services = "4.4.1"
+androidxDatastore = "1.1.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -68,6 +69,7 @@ androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constr
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebase-auth-ktx" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "play-services-auth" }
+androidx-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidxDatastore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

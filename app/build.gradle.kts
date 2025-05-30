@@ -91,11 +91,11 @@ dependencies {
     implementation(dependencyNotation = libs.gson)
     implementation(dependencyNotation = libs.converter.serialization)
     implementation(dependencyNotation = libs.kotlin.serialization)
-    implementation(libs.androidx.constraintlayout.compose)
-
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.play.services.auth)
+    implementation(dependencyNotation = libs.androidx.constraintlayout.compose)
+    implementation(dependencyNotation = libs.androidx.datastore)
+    implementation(dependencyNotation = platform(libs.firebase.bom))
+    implementation(dependencyNotation = libs.firebase.auth.ktx)
+    implementation(dependencyNotation = libs.play.services.auth)
 
     implementation(dependencyNotation = libs.glide.core)
 
