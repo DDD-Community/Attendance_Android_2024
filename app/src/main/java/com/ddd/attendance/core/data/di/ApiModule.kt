@@ -1,11 +1,11 @@
-package com.ddd.attendance.core.network.di
+package com.ddd.attendance.core.data.di
 
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.ddd.attendance.BuildConfig
-import com.ddd.attendance.core.network.service.MemberApiService
-import com.ddd.attendance.core.network.service.QrApiService
+import com.ddd.attendance.core.data.api.AccountsApi
+import com.ddd.attendance.core.data.api.InvitesApi
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -20,9 +20,9 @@ import retrofit2.create
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
 @Module
-object NetworkModule {
+@InstallIn(SingletonComponent::class)
+object ApiModule {
     @Provides
     @Singleton
     fun provideGson(): Gson {
@@ -42,7 +42,7 @@ object NetworkModule {
         gsonConverterFactory: GsonConverterFactory,
     ): Retrofit = Retrofit.Builder()
         .client(okHttpClient)
-        .baseUrl("https://localhost:8000/v1/")
+        .baseUrl("https://home.ufxpri.dev/")
         .addConverterFactory(gsonConverterFactory)
         .build()
 
@@ -96,13 +96,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideQrCodeApiService(retrofit: Retrofit): QrApiService {
+    fun provideAccountsApi(retrofit: Retrofit): AccountsApi {
         return retrofit.create()
     }
 
     @Provides
     @Singleton
-    fun provideMemberApiService(retrofit: Retrofit): MemberApiService {
+    fun provideInvitesApi(retrofit: Retrofit): InvitesApi {
         return retrofit.create()
     }
 }

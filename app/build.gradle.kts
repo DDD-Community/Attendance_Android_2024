@@ -5,6 +5,7 @@ plugins {
     alias(notation = libs.plugins.hilt.android)
     alias(notation = libs.plugins.kotlinx.serialization)
     alias(notation = libs.plugins.compose.compiler)
+    alias(notation = libs.plugins.google.services)
 }
 
 android {
@@ -91,6 +92,10 @@ dependencies {
     implementation(dependencyNotation = libs.converter.serialization)
     implementation(dependencyNotation = libs.kotlin.serialization)
     implementation(libs.androidx.constraintlayout.compose)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.play.services.auth)
 
     implementation(dependencyNotation = libs.glide.core)
 

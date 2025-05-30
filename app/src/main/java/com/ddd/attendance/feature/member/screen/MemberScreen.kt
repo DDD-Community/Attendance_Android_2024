@@ -26,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ddd.attendance.R
 import com.ddd.attendance.core.designsystem.AttendanceStatusRow
@@ -48,7 +47,6 @@ fun MemberScreen(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val attendanceUiState = viewModel.attendanceUiState.collectAsStateWithLifecycle()
 
     Box(
         modifier = Modifier.fillMaxSize()

@@ -51,8 +51,8 @@ fun NameScreen(
         onClickBackButton = {
             navController.popBackStack()
         },
-        onClickNext = {
-            viewModel.onClickNextFromUserName()
+        onClickNext = { name ->
+            viewModel.setUpdateUserName(value = name)
             navController.navigate(route = ScreenName.JOB.name)
         }
     )
@@ -61,7 +61,7 @@ fun NameScreen(
 @Composable
 private fun Content(
     onClickBackButton: () -> Unit,
-    onClickNext: () -> Unit
+    onClickNext: (value: String) -> Unit
 ) {
     var value by remember {
         mutableStateOf(TextFieldValue(""))
@@ -108,7 +108,9 @@ private fun Content(
             text = "다음",
             modifier = Modifier.fillMaxWidth(),
             isEnabled = value.text.isNotEmpty(),
-            onClick = onClickNext
+            onClick = {
+                onClickNext(value.text)
+            }
         )
     }
 }

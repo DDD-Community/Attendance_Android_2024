@@ -24,6 +24,10 @@ retrofitScalars = "2.11.0"
 chucker = "4.1.0"
 glide = "5.0.0-rc01"
 constraintlayout = "1.1.0"
+firebase-bom = "32.8.0"
+firebase-auth-ktx = "23.0.0"
+play-services-auth = "21.0.0"
+google-services = "4.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -61,6 +65,9 @@ chucker-debug = { module = "com.github.chuckerteam.chucker:library", version.ref
 chucker-release = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
 glide-core = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayout" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
+firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebase-auth-ktx" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "play-services-auth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -69,3 +76,4 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "googleHilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

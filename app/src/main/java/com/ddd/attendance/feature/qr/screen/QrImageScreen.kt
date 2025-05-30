@@ -25,7 +25,6 @@ import com.ddd.attendance.core.designsystem.DDDTopBar
 import com.ddd.attendance.core.designsystem.TopBarType
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
-import com.ddd.attendance.feature.main.screen.ScreenName
 import com.ddd.attendance.feature.qr.QrViewModel
 
 @Composable

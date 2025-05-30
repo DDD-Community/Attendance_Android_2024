@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +38,9 @@ import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_20
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
 import com.ddd.attendance.feature.login.LoginProcessViewModel
+import com.ddd.attendance.feature.login.ScreenName
+import com.ddd.attendance.feature.login.model.RegistrationUiState
+import com.ddd.attendance.feature.login.model.ValidateUiState
 import com.ddd.attendance.feature.main.MainActivity
 
 @Composable
@@ -44,13 +49,31 @@ fun AffiliationScreen(
     viewModel: LoginProcessViewModel
 ) {
     val context = LocalContext.current as? Activity
+
+    val registrationUiState by viewModel.registrationUiState.collectAsState()
+
+    LaunchedEffect(registrationUiState) {
+        if (registrationUiState is RegistrationUiState.Success) {
+            val result = (registrationUiState as RegistrationUiState.Success).data
+            val userId = result.user?.id ?: ""
+            val accessToken = result.accessToken
+
+            if (userId.isNotBlank() && accessToken.isNotBlank()) {
+                context?.startActivity(Intent(context, MainActivity::class.java))
+                context?.finish()
+            }
+        }
+    }
+
     Content(
         onClickBackButton = {
             navController.popBackStack()
         },
-        onClickNext = {
-            // 어디로 가야하는가~
-            viewModel.onClickNextFromUserAffiliation()
+        onClickNext = { affiliation ->
+            viewModel.setUpdateUserAffiliation(affiliation)
+
+            viewModel.registration()
+
             context?.startActivity(Intent(context, MainActivity::class.java))
             context?.finish()
         }
@@ -60,7 +83,7 @@ fun AffiliationScreen(
 @Composable
 private fun Content(
     onClickBackButton: () -> Unit,
-    onClickNext: () -> Unit
+    onClickNext: (value: String) -> Unit
 ) {
     val list = listOf(
         "팀 매니징",
@@ -93,7 +116,11 @@ private fun Content(
                 text = "가입 완료",
                 modifier = Modifier
                     .fillMaxWidth(),
-                onClick = onClickNext,
+                onClick = {
+                    onClickNext(
+                        list[selectedIndex]
+                    )
+                },
                 isEnabled = selectedIndex != -1
             )
         }

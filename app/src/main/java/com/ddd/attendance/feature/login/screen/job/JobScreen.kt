@@ -40,8 +40,8 @@ fun JobScreen(
     viewModel: LoginProcessViewModel
 ) {
     Content(
-        onClickNext = {
-            viewModel.onClickNextFromUserJob()
+        onClickNext = { jobRole ->
+            viewModel.setUpdateUserJobRole(value = jobRole)
             navController.navigate(route = ScreenName.AFFILIATION.name)
         },
         onClickBackButton = {
@@ -53,7 +53,7 @@ fun JobScreen(
 @Composable
 private fun Content(
     onClickBackButton: () -> Unit,
-    onClickNext: () -> Unit
+    onClickNext: (value: String) -> Unit
 ) {
     val list = listOf(
         "Product Manager",
@@ -86,7 +86,11 @@ private fun Content(
                 text = "다음",
                 modifier = Modifier
                     .fillMaxWidth(),
-                onClick = onClickNext,
+                onClick = {
+                    onClickNext(
+                        list[selectedIndex]
+                    )
+                },
                 isEnabled = selectedIndex != -1
             )
         }

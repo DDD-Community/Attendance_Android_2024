@@ -9,6 +9,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ddd.attendance.core.model.accounts.google.GoogleLogin
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.feature.login.screen.affiliation.AffiliationScreen
 import com.ddd.attendance.feature.login.screen.invitationcode.InvitationCodeScreen
@@ -17,7 +18,11 @@ import com.ddd.attendance.feature.login.screen.login.LoginScreen
 import com.ddd.attendance.feature.login.screen.name.NameScreen
 
 @Composable
-fun LoginProcessScreen() {
+fun LoginProcessScreen(
+    snackBarMessage: String?,
+    onDismissSnackBar: () -> Unit,
+    onClickGoogle: ((GoogleLogin) -> Unit) -> Unit,
+) {
     val navController = rememberNavController()
     val viewModel: LoginProcessViewModel = hiltViewModel()
 
@@ -33,7 +38,10 @@ fun LoginProcessScreen() {
             composable(route = ScreenName.LOGIN.name) {
                 LoginScreen(
                     navController = navController,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    snackBarMessage = snackBarMessage,
+                    onDismissSnackBar = onDismissSnackBar,
+                    onClickGoogle = onClickGoogle
                 )
             }
             composable(route = ScreenName.INVITATION_CODE.name) {
