@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface InvitesRepository {
     fun validate(inviteCode: String): Flow<Validate>
+    fun getInviteCode(): Flow<String>
 }

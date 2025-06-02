@@ -71,11 +71,7 @@ fun AffiliationScreen(
         },
         onClickNext = { affiliation ->
             viewModel.setUpdateUserAffiliation(affiliation)
-
             viewModel.registration()
-
-            context?.startActivity(Intent(context, MainActivity::class.java))
-            context?.finish()
         }
     )
 }

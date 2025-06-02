@@ -5,6 +5,5 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetAccessTokenUseCase @Inject constructor(private val repository: AccountsRepository) {
-    operator fun invoke(): Flow<String> =
-        repository.getAccessToken()
+    operator fun invoke(): Flow<String> = repository.getAccessToken()
 }

@@ -4,5 +4,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface AccountPreferencesDataSource {
     val accountAccessToken: Flow<String>
-    suspend fun updateAccountAccessToken(accountAccessToken: String)
+    suspend fun updateAccountAccessToken(accessToken: String)
+
+    val accountInviteType: Flow<String>
+    suspend fun updateAccountInviteType(inviteType: String)
 }

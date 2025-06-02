@@ -25,5 +25,8 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideInvitesRepository(api: InvitesApi): InvitesRepository = DefaultInvitesRepository(api)
+    fun provideInvitesRepository(
+        api: InvitesApi,
+        dataStore: AccountPreferencesDataSource
+    ): InvitesRepository = DefaultInvitesRepository(api,dataStore)
 }
