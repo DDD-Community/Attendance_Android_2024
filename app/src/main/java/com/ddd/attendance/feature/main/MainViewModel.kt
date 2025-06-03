@@ -23,16 +23,13 @@ class MainViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             inviteTypeUseCase().collect {
-                _startDestination.value = when (it) {
+                val loginType = when (it) {
                     "member" -> ScreenName.MEMBER.name
                     "admin" -> ScreenName.ADMIN.name
                     else -> ScreenName.NONE.name
                 }
+                _startDestination.value = loginType
             }
         }
     }
-
-    /*private fun getDummyLoginMethodAsync(): String {
-        return "member"
-    }*/
 }

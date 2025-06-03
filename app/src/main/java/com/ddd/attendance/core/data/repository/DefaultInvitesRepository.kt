@@ -32,8 +32,6 @@ class DefaultInvitesRepository @Inject constructor(
     }
 
     override fun getInviteCode(): Flow<String> {
-        return inviteType.filter {
-            it.isNotBlank()
-        }
+        return inviteType
     }
 }
