@@ -25,7 +25,7 @@ class MainViewModel @Inject constructor(
             inviteTypeUseCase().collect {
                 val loginType = when (it) {
                     "member" -> ScreenName.MEMBER.name
-                    "admin" -> ScreenName.ADMIN.name
+                    "moderator" -> ScreenName.ADMIN.name
                     else -> ScreenName.NONE.name
                 }
                 _startDestination.value = loginType
