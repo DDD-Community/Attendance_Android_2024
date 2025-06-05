@@ -28,10 +28,10 @@ class LoginProcessViewModel @Inject constructor(
     val userInfo: StateFlow<UserInfo> = _userInfo.asStateFlow()
 
     private val _validateUiState = MutableStateFlow<ValidateUiState>(ValidateUiState.Empty)
-    val validateUiState: StateFlow<ValidateUiState> = _validateUiState
+    val validateUiState: StateFlow<ValidateUiState> = _validateUiState.asStateFlow()
 
     private val _registrationUiState = MutableStateFlow<RegistrationUiState>(RegistrationUiState.Empty)
-    val registrationUiState: StateFlow<RegistrationUiState> = _registrationUiState
+    val registrationUiState: StateFlow<RegistrationUiState> = _registrationUiState.asStateFlow()
 
     fun setUpdateUser(googleLogin: GoogleLogin) {
         _userInfo.value = _userInfo.value.copy(

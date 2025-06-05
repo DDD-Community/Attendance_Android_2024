@@ -38,9 +38,7 @@ import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_20
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
 import com.ddd.attendance.feature.login.LoginProcessViewModel
-import com.ddd.attendance.feature.login.ScreenName
 import com.ddd.attendance.feature.login.model.RegistrationUiState
-import com.ddd.attendance.feature.login.model.ValidateUiState
 import com.ddd.attendance.feature.main.MainActivity
 
 @Composable

@@ -8,7 +8,6 @@ import com.ddd.attendance.core.model.accounts.Registration
 import com.ddd.attendance.core.network.AccountsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
