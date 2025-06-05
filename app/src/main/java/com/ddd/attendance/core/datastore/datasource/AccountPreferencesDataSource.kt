@@ -8,4 +8,7 @@ interface AccountPreferencesDataSource {
 
     val accountInviteType: Flow<String>
     suspend fun updateAccountInviteType(inviteType: String)
+
+    val accountUserId: Flow<Int>
+    suspend fun updateAccountUserId(userId: Int)
 }

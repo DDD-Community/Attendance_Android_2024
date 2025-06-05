@@ -55,10 +55,10 @@ fun AffiliationScreen(
     LaunchedEffect(registrationUiState) {
         if (registrationUiState is RegistrationUiState.Success) {
             val result = (registrationUiState as RegistrationUiState.Success).data
-            val userId = result.user?.id ?: ""
+            val userId = result.user?.id ?: -1
             val accessToken = result.accessToken
 
-            if (userId.isNotBlank() && accessToken.isNotBlank()) {
+            if (userId != -1 && accessToken.isNotBlank()) {
                 context?.startActivity(Intent(context, MainActivity::class.java))
                 context?.finish()
             }

@@ -41,6 +41,9 @@ class DefaultAccountsRepository @Inject constructor(
                 user = null
             )
         )
+        data.user?.id?.let {
+            dataSource.updateAccountUserId(it)
+        }
 
         dataSource.updateAccountAccessToken(data.accessToken)
 
