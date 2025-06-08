@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RegistrationUserResponse(
-    val pk: String,
+    val pk: Int,
     val email: String,
     @SerializedName("username") val name: String,
     @SerializedName("first_name") val firstName: String,

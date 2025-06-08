@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface AccountsRepository {
     fun registration(owner: String, email: String, password1: String, password2: String): Flow<Registration>
+    fun getAccessToken(): Flow<String>
 }

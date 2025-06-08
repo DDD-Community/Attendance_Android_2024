@@ -87,7 +87,7 @@ class LoginProcessActivity : ComponentActivity() {
     }
 
     private fun handleSignInResult(result: ActivityResult) {
-        if (result.resultCode != RESULT_OK) return
+        //if (result.resultCode != RESULT_OK) return
 
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {

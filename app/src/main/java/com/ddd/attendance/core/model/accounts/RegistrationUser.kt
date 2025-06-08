@@ -3,7 +3,7 @@ package com.ddd.attendance.core.model.accounts
 import com.ddd.attendance.core.data.api.model.accounts.RegistrationUserResponse
 
 data class RegistrationUser(
-    val id: String,
+    val id: Int,
     val username: String,
     val email: String,
     val firstName: String,
@@ -12,7 +12,7 @@ data class RegistrationUser(
     companion object {
         fun from(response: RegistrationUserResponse?): RegistrationUser {
             return RegistrationUser(
-                id = response?.pk ?: "",
+                id = response?.pk ?: - 1,
                 username = response?.name ?: "",
                 email = response?.email ?: "",
                 firstName = response?.firstName ?: "",
