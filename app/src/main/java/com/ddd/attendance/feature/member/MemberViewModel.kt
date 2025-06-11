@@ -2,35 +2,33 @@ package com.ddd.attendance.feature.member
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.ddd.attendance.core.domain.usecase.attendance.AttendanceCountUseCase
+import com.ddd.attendance.feature.main.model.AttendanceCountUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class MemberViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
+    private val attendanceCountUseCase: AttendanceCountUseCase
 ) : ViewModel() {
-
-    private val _memberId = MutableStateFlow(savedStateHandle["member"] ?: "")
-
-    /*val attendanceUiState: StateFlow<MemberAttendanceUiState> = _memberId
-        .filter { it.isNotEmpty() }
-        .flatMapLatest { id ->
-            memberAttendanceUseCase(id)
-                .map { data ->
-                    if (data.attendanceRecords.isNotEmpty()) {
-                        MemberAttendanceUiState.Success(data.attendanceRecords)
-                    } else {
-                        MemberAttendanceUiState.Empty
-                    }
-                }
-                .catch { throwable ->
-                    emit(MemberAttendanceUiState.Error(throwable.message.default()))
-                }
-        }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5_000L),
-            MemberAttendanceUiState.Loading
-        )*/
+    val attendanceCountUiState: StateFlow<AttendanceCountUiState> =
+        attendanceCountUseCase()
+            .map { data ->
+                AttendanceCountUiState.Success(data)
+            }
+            .catch { e ->
+               AttendanceCountUiState.Error(e.message?: "Unknown Error")
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000L),
+                AttendanceCountUiState.Loading
+            )
 }

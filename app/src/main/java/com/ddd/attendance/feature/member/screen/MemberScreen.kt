@@ -17,6 +17,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +39,7 @@ import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_BLUE_20
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_20
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_90
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
+import com.ddd.attendance.feature.main.model.AttendanceCountUiState
 import com.ddd.attendance.feature.main.screen.ScreenName
 import com.ddd.attendance.feature.member.MemberViewModel
 
@@ -48,10 +51,13 @@ fun MemberScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
+    val attendanceCountUiState by viewModel.attendanceCountUiState.collectAsState()
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         Content(
+            attendanceCountUiState = attendanceCountUiState,
             onPressQrcode = { navController.navigate(ScreenName.QR_IMAGE.name) },
             onPressMyInfo = { navController.navigate(ScreenName.MY_PAGE.name) },
             onBackClicked = {}
@@ -61,6 +67,7 @@ fun MemberScreen(
 
 @Composable
 private fun Content(
+    attendanceCountUiState: AttendanceCountUiState,
     onPressMyInfo: () -> Unit,
     onPressQrcode: () -> Unit,
     onBackClicked: () -> Unit
@@ -99,7 +106,15 @@ private fun Content(
 
                     Spacer(Modifier.height(8.dp))
 
-                    DDDMemberSituation(attendanceCount = 8, tardyCount = 2, absentCount = 1)
+                    if (attendanceCountUiState is AttendanceCountUiState.Success) {
+                        attendanceCountUiState.data.apply {
+                            DDDMemberSituation(
+                                attendanceCount = presentCount,
+                                tardyCount = lateCount,
+                                absentCount = absentCount
+                            )
+                        }
+                    } else DDDMemberSituation()
 
                     Spacer(Modifier.height(56.dp))
 
@@ -147,7 +162,10 @@ private fun ScheduleItem(schedule: Schedule) {
 @Composable
 private fun ScheduleDateBox(schedule: Schedule) {
     Box(
-        modifier = Modifier.size(54.dp).clip(RoundedCornerShape(10.dp)).background(DDD_NEUTRAL_BLUE_20),
+        modifier = Modifier
+            .size(54.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(DDD_NEUTRAL_BLUE_20),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {

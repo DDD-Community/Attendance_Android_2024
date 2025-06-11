@@ -15,15 +15,11 @@ import com.ddd.attendance.feature.login.model.RegistrationUiState
 import com.ddd.attendance.feature.login.model.ValidateUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,8 +40,8 @@ class LoginProcessViewModel @Inject constructor(
     private val _registrationUiState = MutableStateFlow<RegistrationUiState>(RegistrationUiState.Empty)
     val registrationUiState: StateFlow<RegistrationUiState> = _registrationUiState.asStateFlow()
 
-    /*private val _profileUiState = MutableStateFlow<ProfileMeUiState>(ProfileMeUiState.Empty)
-    val profileUiState: StateFlow<ProfileMeUiState> = _profileUiState.asStateFlow()*/
+    private val _profileMeUiState = MutableStateFlow<ProfileMeUiState>(ProfileMeUiState.Empty)
+    val profileMeUiState: StateFlow<ProfileMeUiState> = _profileMeUiState.asStateFlow()
 
     fun setUpdateUser(googleLogin: GoogleLogin) {
         _userInfo.value = _userInfo.value.copy(
@@ -74,15 +70,18 @@ class LoginProcessViewModel @Inject constructor(
 
     fun inviteValidation(value: String) {
         viewModelScope.launch {
-            _validateUiState.value = ValidateUiState.Loading
-
             try {
                 validateUseCase(inviteCode = value)
                     .filterNotNull()
-                    .collect { result ->
-                        _validateUiState.value = ValidateUiState.Success(result)
-                        setUpdateUserInviteType(result.inviteType)
-                        setUpdateUserInviteCodeId(result.inviteCodeId)
+                    .map { ValidateUiState.Success(it) as ValidateUiState }
+                    .catch { emit(ValidateUiState.Error(it.message ?: "Unknown Error")) }
+                    .collect { state ->
+                        _validateUiState.value = state
+
+                        if (state is ValidateUiState.Success) {
+                            setUpdateUserInviteType(state.data.inviteType)
+                            setUpdateUserInviteCodeId(state.data.inviteCodeId)
+                        }
                     }
             } catch (e: Exception) {
                 _validateUiState.value = ValidateUiState.Error(e.message ?: "Unknown error")
@@ -92,9 +91,11 @@ class LoginProcessViewModel @Inject constructor(
 
     fun registration() {
         viewModelScope.launch {
-            _registrationUiState.value = RegistrationUiState.Loading
             try {
+                _registrationUiState.value = RegistrationUiState.Loading
+
                 val userInfo = _userInfo.value
+
                 registrationUseCase(
                     owner = userInfo.name,
                     email = userInfo.email,
@@ -102,8 +103,14 @@ class LoginProcessViewModel @Inject constructor(
                     password2 = userInfo.uid
                 )
                     .filterNotNull()
-                    .collect { result ->
-                        _registrationUiState.value = RegistrationUiState.Success(result)
+                    .map { RegistrationUiState.Success(it) as RegistrationUiState }
+                    .catch { emit(RegistrationUiState.Error(it.message ?: "Unknown Error")) }
+                    .collect { state ->
+                        _registrationUiState.value = state
+
+                        if (state is RegistrationUiState.Success) {
+                            launchProfileMeUpdate()
+                        }
                     }
             } catch (e: Exception) {
                 _registrationUiState.value = RegistrationUiState.Error(e.message ?: "Unknown error")
@@ -115,25 +122,26 @@ class LoginProcessViewModel @Inject constructor(
         _validateUiState.value = ValidateUiState.Empty
     }
 
-    val profileMeUiState: StateFlow<ProfileMeUiState> =
-        userInfo
-            .filterNotNull()
-            .filter { it.affiliation.isNotEmpty() }
-            .flatMapLatest { user ->
+
+    private fun launchProfileMeUpdate() {
+        viewModelScope.launch {
+            try {
                 profileMeUseCase(
-                    name = user.name,
-                    inviteCodeId = user.inviteCodeId,
-                    role = user.role,
-                    team = user.team,
-                    responsibility = user.affiliation,
+                    name = _userInfo.value.name,
+                    inviteCodeId = _userInfo.value.inviteCodeId,
+                    role = _userInfo.value.role,
+                    team = _userInfo.value.team,
+                    responsibility = _userInfo.value.affiliation,
                     cohort = ""
                 )
                     .map { ProfileMeUiState.Success(it) as ProfileMeUiState }
                     .catch { emit(ProfileMeUiState.Error(it.message ?: "Unknown Error")) }
+                    .collect { state ->
+                        _profileMeUiState.value = state
+                    }
+            } catch (e: Exception) {
+                _profileMeUiState.value = ProfileMeUiState.Error(e.message ?: "Unknown error")
             }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = ProfileMeUiState.Loading
-            )
+        }
+    }
 }
