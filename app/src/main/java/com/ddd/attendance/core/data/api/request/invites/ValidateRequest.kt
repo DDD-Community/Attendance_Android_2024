@@ -1,4 +1,4 @@
-package com.ddd.attendance.core.data.api.request.validate
+package com.ddd.attendance.core.data.api.request.invites
 
 import com.google.gson.annotations.SerializedName
 

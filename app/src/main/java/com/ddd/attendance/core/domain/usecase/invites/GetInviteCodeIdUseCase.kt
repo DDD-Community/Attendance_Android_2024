@@ -4,9 +4,8 @@ import com.ddd.attendance.core.network.InvitesRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-
-class GetInviteTypeUseCase @Inject constructor(
+class GetInviteCodeIdUseCase @Inject constructor(
     private val repository: InvitesRepository
 ) {
-    operator fun invoke(): Flow<String> = repository.getInviteType()
+    operator fun invoke(): Flow<String> = repository.getInviteCodeId()
 }

@@ -5,24 +5,35 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ddd.attendance.core.domain.usecase.accounts.RegistrationUseCase
+import com.ddd.attendance.core.domain.usecase.invites.GetInviteCodeIdUseCase
 import com.ddd.attendance.core.domain.usecase.invites.ValidateUseCase
+import com.ddd.attendance.core.domain.usecase.profiles.ProfileMeUseCase
 import com.ddd.attendance.core.model.accounts.UserInfo
-import com.ddd.attendance.core.model.accounts.google.GoogleLogin
+import com.ddd.attendance.core.model.google.GoogleLogin
+import com.ddd.attendance.feature.login.model.ProfileMeUiState
 import com.ddd.attendance.feature.login.model.RegistrationUiState
 import com.ddd.attendance.feature.login.model.ValidateUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginProcessViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
+    private val getInviteCodeIdUseCase: GetInviteCodeIdUseCase,
     private val validateUseCase: ValidateUseCase,
     private val registrationUseCase: RegistrationUseCase,
+    private val profileMeUseCase: ProfileMeUseCase,
 ) : ViewModel() {
     private val _userInfo = MutableStateFlow(UserInfo())
     val userInfo: StateFlow<UserInfo> = _userInfo.asStateFlow()
@@ -32,6 +43,9 @@ class LoginProcessViewModel @Inject constructor(
 
     private val _registrationUiState = MutableStateFlow<RegistrationUiState>(RegistrationUiState.Empty)
     val registrationUiState: StateFlow<RegistrationUiState> = _registrationUiState.asStateFlow()
+
+    /*private val _profileUiState = MutableStateFlow<ProfileMeUiState>(ProfileMeUiState.Empty)
+    val profileUiState: StateFlow<ProfileMeUiState> = _profileUiState.asStateFlow()*/
 
     fun setUpdateUser(googleLogin: GoogleLogin) {
         _userInfo.value = _userInfo.value.copy(
@@ -46,12 +60,15 @@ class LoginProcessViewModel @Inject constructor(
         _userInfo.value = _userInfo.value.update()
         Log.d(logTag, "${_userInfo.value}")
     }
+    private fun setUpdateUserInviteType(value: String) = updateUserInfo(update = { copy(inviteType = value) }, "유저 타입 업데이트")
 
-    private fun setUpdateUserInviteType(value: String) = updateUserInfo(update = { copy(inviteType = value) }, "유저 초대 코드 압데이트")
+    private fun setUpdateUserInviteCodeId(value: String) = updateUserInfo(update = { copy(inviteCodeId = value) }, "유저 초대 코드 ID 업데이트")
 
     fun setUpdateUserName(value: String) = updateUserInfo(update = { copy(name = value) }, "유저 이름 업데이트")
 
-    fun setUpdateUserJobRole(value: String) = updateUserInfo(update = { copy(jobRole = value) }, "유저 직무 업데이트")
+    fun setUpdateUserRole(value: String) = updateUserInfo(update = { copy(role = value) }, "유저 직무 업데이트")
+
+    fun setUpdateUserTeam(value: String) = updateUserInfo(update = { copy(team = value) }, "유저 팀 업데이트")
 
     fun setUpdateUserAffiliation(value: String) = updateUserInfo(update = { copy(affiliation = value) }, "유저 소속 업데이트")
 
@@ -64,6 +81,8 @@ class LoginProcessViewModel @Inject constructor(
                     .filterNotNull()
                     .collect { result ->
                         _validateUiState.value = ValidateUiState.Success(result)
+                        setUpdateUserInviteType(result.inviteType)
+                        setUpdateUserInviteCodeId(result.inviteCodeId)
                     }
             } catch (e: Exception) {
                 _validateUiState.value = ValidateUiState.Error(e.message ?: "Unknown error")
@@ -96,29 +115,25 @@ class LoginProcessViewModel @Inject constructor(
         _validateUiState.value = ValidateUiState.Empty
     }
 
-    /*@OptIn(ExperimentalCoroutinesApi::class)
-    val registrationUiState: StateFlow<RegistrationUiState> =
-        _googleInfo
+    val profileMeUiState: StateFlow<ProfileMeUiState> =
+        userInfo
             .filterNotNull()
-            .filter { it.uid.isNotEmpty() } // 인증 성공된 사용자만
-            // flatMapLatest: userInfo가 바뀔 때마다 registrationUseCase를 새로 실행
+            .filter { it.affiliation.isNotEmpty() }
             .flatMapLatest { user ->
-                registrationUseCase(
-                    owner = user.name,
-                    email = user.email,
-                    password1 = user.uid,
-                    password2 = user.uid
+                profileMeUseCase(
+                    name = user.name,
+                    inviteCodeId = user.inviteCodeId,
+                    role = user.role,
+                    team = user.team,
+                    responsibility = user.affiliation,
+                    cohort = ""
                 )
-                    .map {
-                        RegistrationUiState.Success(it)
-                    }
-            }
-            .catch {
-                RegistrationUiState.Error("${it.message}")
+                    .map { ProfileMeUiState.Success(it) as ProfileMeUiState }
+                    .catch { emit(ProfileMeUiState.Error(it.message ?: "Unknown Error")) }
             }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = RegistrationUiState.Loading
-            )*/
+                initialValue = ProfileMeUiState.Loading
+            )
 }

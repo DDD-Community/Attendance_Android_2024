@@ -12,11 +12,12 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class DefaultAccountPreferencesDataSource @Inject constructor (
-    @Named("account") private val dataStore: DataStore<Preferences>,
+    @Named("account") private val dataStore: DataStore<Preferences>
 ): AccountPreferencesDataSource {
     object PreferencesKey {
         val ACCOUNT_ACCESS_TOKEN = stringPreferencesKey("ACCOUNT_ACCESS_TOKEN")
         val ACCOUNT_INVITE_TYPE = stringPreferencesKey("ACCOUNT_INVITE_TYPE")
+        val ACCOUNT_INVITE_CODE_ID = stringPreferencesKey("ACCOUNT_INVITE_CODE_ID")
         val ACCOUNT_USER_ID = intPreferencesKey("ACCOUNT_USER_ID")
     }
 
@@ -38,7 +39,7 @@ class DefaultAccountPreferencesDataSource @Inject constructor (
     override suspend fun updateAccountInviteType(inviteType: String) {
         dataStore.edit { preferences ->
             preferences[PreferencesKey.ACCOUNT_INVITE_TYPE] = inviteType
-            Log.e("Datastore 초대 코드", "${preferences[PreferencesKey.ACCOUNT_INVITE_TYPE]}")
+            Log.e("Datastore 초대 타입", "${preferences[PreferencesKey.ACCOUNT_INVITE_TYPE]}")
         }
     }
 
@@ -50,6 +51,17 @@ class DefaultAccountPreferencesDataSource @Inject constructor (
         dataStore.edit { preferences ->
             preferences[PreferencesKey.ACCOUNT_USER_ID] = userId
             Log.e("Datastore 유저 아이디", "${preferences[PreferencesKey.ACCOUNT_USER_ID]}")
+        }
+    }
+
+    override val accountInviteCodeId: Flow<String> = dataStore.data.map { preferences ->
+        preferences[PreferencesKey.ACCOUNT_INVITE_CODE_ID] ?: ""
+    }
+
+    override suspend fun updateAccountInviteCodeId(inviteCodeId: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKey.ACCOUNT_INVITE_CODE_ID] = inviteCodeId
+            Log.e("Datastore 유저 초대 코드 ID", "${preferences[PreferencesKey.ACCOUNT_INVITE_CODE_ID]}")
         }
     }
 }

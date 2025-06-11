@@ -4,9 +4,12 @@ import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.ddd.attendance.BuildConfig
+import com.ddd.attendance.core.data.AuthorizationInterceptor
 import com.ddd.attendance.core.data.api.AccountsApi
 import com.ddd.attendance.core.data.api.AttendanceApi
 import com.ddd.attendance.core.data.api.InvitesApi
+import com.ddd.attendance.core.data.api.ProfilesApi
+import com.ddd.attendance.core.datastore.datasource.AccountPreferencesDataSource
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -71,6 +74,14 @@ object ApiModule {
 
     @Provides
     @Singleton
+    fun provideAuthorizationInterceptor(
+        dataSource: AccountPreferencesDataSource
+    ): AuthorizationInterceptor {
+        return AuthorizationInterceptor(dataSource)
+    }
+
+    @Provides
+    @Singleton
     fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor()
             .apply {
@@ -87,7 +98,9 @@ object ApiModule {
     fun provideOkHttpClient(
         httpLoggingInterceptor: HttpLoggingInterceptor,
         chuckerInterceptor: ChuckerInterceptor,
+        authorizationInterceptor: AuthorizationInterceptor
     ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(authorizationInterceptor)
         .addInterceptor(chuckerInterceptor)
         .addInterceptor(httpLoggingInterceptor)
         .connectTimeout(60, TimeUnit.SECONDS)
@@ -112,4 +125,11 @@ object ApiModule {
     fun provideAttendanceApi(retrofit: Retrofit): AttendanceApi {
         return retrofit.create()
     }
+
+    @Provides
+    @Singleton
+    fun provideProfilesApi(retrofit: Retrofit): ProfilesApi {
+        return retrofit.create()
+    }
+
 }

@@ -4,7 +4,9 @@ data class UserInfo(
     val email: String = "",
     val name: String = "",
     val uid: String = "",
-    val jobRole: String = "",
+    val role: String = "",
+    val team: String = "",
     val affiliation: String = "",
-    val inviteType: String = ""
+    val inviteType: String = "",
+    val inviteCodeId: String = ""
 )

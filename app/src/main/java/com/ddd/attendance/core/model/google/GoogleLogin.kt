@@ -1,4 +1,4 @@
-package com.ddd.attendance.core.model.accounts.google
+package com.ddd.attendance.core.model.google
 
 data class GoogleLogin(
     val email: String = "",

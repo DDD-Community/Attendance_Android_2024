@@ -2,7 +2,7 @@ package com.ddd.attendance.core.data.api
 
 import com.ddd.attendance.core.data.ApiResponse
 import com.ddd.attendance.core.data.api.model.invites.ValidateDataResponse
-import com.ddd.attendance.core.data.api.request.validate.ValidateRequest
+import com.ddd.attendance.core.data.api.request.invites.ValidateRequest
 import retrofit2.http.Body
 import retrofit2.http.POST
 

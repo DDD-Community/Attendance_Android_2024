@@ -2,7 +2,7 @@ package com.ddd.attendance.feature.login.model
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import com.ddd.attendance.core.model.accounts.Validate
+import com.ddd.attendance.core.model.invites.Validate
 
 @Stable
 sealed interface ValidateUiState {
