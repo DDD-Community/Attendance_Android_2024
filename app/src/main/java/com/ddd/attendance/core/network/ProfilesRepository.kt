@@ -4,7 +4,7 @@ import com.ddd.attendance.core.model.invites.ProfileMe
 import kotlinx.coroutines.flow.Flow
 
 interface ProfilesRepository {
-    fun profileMe(
+    fun patchProfileMe(
         name: String,
         inviteCodeId: String,
         role: String,
@@ -12,4 +12,6 @@ interface ProfilesRepository {
         responsibility: String,
         cohort: String
     ): Flow<ProfileMe>
+
+    fun getProfileMe(): Flow<ProfileMe>
 }

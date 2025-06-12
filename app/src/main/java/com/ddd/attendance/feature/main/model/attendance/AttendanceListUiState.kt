@@ -1,4 +1,4 @@
-package com.ddd.attendance.feature.main.model
+package com.ddd.attendance.feature.main.model.attendance
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable

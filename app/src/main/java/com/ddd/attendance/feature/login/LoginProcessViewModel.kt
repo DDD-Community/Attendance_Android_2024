@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ddd.attendance.core.domain.usecase.accounts.RegistrationUseCase
 import com.ddd.attendance.core.domain.usecase.invites.GetInviteCodeIdUseCase
 import com.ddd.attendance.core.domain.usecase.invites.ValidateUseCase
-import com.ddd.attendance.core.domain.usecase.profiles.ProfileMeUseCase
+import com.ddd.attendance.core.domain.usecase.profiles.PatchProfileMeUseCase
 import com.ddd.attendance.core.model.accounts.UserInfo
 import com.ddd.attendance.core.model.google.GoogleLogin
 import com.ddd.attendance.feature.login.model.ProfileMeUiState
@@ -29,7 +29,7 @@ class LoginProcessViewModel @Inject constructor(
     private val getInviteCodeIdUseCase: GetInviteCodeIdUseCase,
     private val validateUseCase: ValidateUseCase,
     private val registrationUseCase: RegistrationUseCase,
-    private val profileMeUseCase: ProfileMeUseCase,
+    private val patchProfileMeUseCase: PatchProfileMeUseCase,
 ) : ViewModel() {
     private val _userInfo = MutableStateFlow(UserInfo())
     val userInfo: StateFlow<UserInfo> = _userInfo.asStateFlow()
@@ -126,7 +126,7 @@ class LoginProcessViewModel @Inject constructor(
     private fun launchProfileMeUpdate() {
         viewModelScope.launch {
             try {
-                profileMeUseCase(
+                patchProfileMeUseCase(
                     name = _userInfo.value.name,
                     inviteCodeId = _userInfo.value.inviteCodeId,
                     role = _userInfo.value.role,

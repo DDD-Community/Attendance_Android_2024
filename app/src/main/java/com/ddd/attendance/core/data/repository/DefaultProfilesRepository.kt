@@ -13,7 +13,7 @@ class DefaultProfilesRepository @Inject constructor(
     private val api: ProfilesApi,
     private val dataSource: AccountPreferencesDataSource
 ): ProfilesRepository {
-    override fun profileMe(
+    override fun patchProfileMe(
         name: String,
         inviteCodeId: String,
         role: String,
@@ -21,7 +21,7 @@ class DefaultProfilesRepository @Inject constructor(
         responsibility: String,
         cohort: String
     ): Flow<ProfileMe> = flow {
-        val response = api.profileMe(
+        val response = api.patchProfileMe(
             request = ProfileMeRequest(
                 name = name,
                 inviteCodeId = inviteCodeId,
@@ -36,6 +36,11 @@ class DefaultProfilesRepository @Inject constructor(
             dataSource.updateAccountInviteType(type)
         }
 
+        emit(ProfileMe.from(response.data))
+    }
+
+    override fun getProfileMe(): Flow<ProfileMe> = flow {
+        val response = api.getProfileMe()
         emit(ProfileMe.from(response.data))
     }
 }

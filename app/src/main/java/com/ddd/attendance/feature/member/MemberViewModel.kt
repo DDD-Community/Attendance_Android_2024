@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ddd.attendance.core.domain.usecase.attendance.AttendanceCountUseCase
 import com.ddd.attendance.core.domain.usecase.attendance.AttendanceListUseCase
-import com.ddd.attendance.feature.main.model.AttendanceCountUiState
-import com.ddd.attendance.feature.main.model.AttendanceListUiState
+import com.ddd.attendance.core.domain.usecase.profiles.GetProfileMeUseCase
+import com.ddd.attendance.feature.login.model.ProfileMeUiState
+import com.ddd.attendance.feature.main.model.attendance.AttendanceCountUiState
+import com.ddd.attendance.feature.main.model.attendance.AttendanceListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,9 +20,24 @@ import javax.inject.Inject
 @HiltViewModel
 class MemberViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
+    private val getProfileMeUseCase: GetProfileMeUseCase,
     private val attendanceCountUseCase: AttendanceCountUseCase,
     private val attendanceListUseCase: AttendanceListUseCase
 ) : ViewModel() {
+
+    val profileMeUiState: StateFlow<ProfileMeUiState> =
+        getProfileMeUseCase()
+            .map { data ->
+                ProfileMeUiState.Success(data)
+            }
+            .catch { e ->
+                ProfileMeUiState.Error(e.message?: "Unknown Error")
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000L),
+                ProfileMeUiState.Loading
+            )
 
     val attendanceListUiState: StateFlow<AttendanceListUiState> =
         attendanceListUseCase()
