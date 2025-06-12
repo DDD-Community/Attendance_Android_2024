@@ -34,12 +34,14 @@ import com.ddd.attendance.core.designsystem.AttendanceStatusRow
 import com.ddd.attendance.core.designsystem.DDDMemberSituation
 import com.ddd.attendance.core.designsystem.DDDText
 import com.ddd.attendance.core.model.Schedule
+import com.ddd.attendance.core.model.attendance.Attendance
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_BLUE_20
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_20
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_90
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
 import com.ddd.attendance.feature.main.model.AttendanceCountUiState
+import com.ddd.attendance.feature.main.model.AttendanceListUiState
 import com.ddd.attendance.feature.main.screen.ScreenName
 import com.ddd.attendance.feature.member.MemberViewModel
 
@@ -52,12 +54,14 @@ fun MemberScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val attendanceCountUiState by viewModel.attendanceCountUiState.collectAsState()
+    val attendanceListUiState by viewModel.attendanceListUiState.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         Content(
             attendanceCountUiState = attendanceCountUiState,
+            attendanceListUiState = attendanceListUiState,
             onPressQrcode = { navController.navigate(ScreenName.QR_IMAGE.name) },
             onPressMyInfo = { navController.navigate(ScreenName.MY_PAGE.name) },
             onBackClicked = {}
@@ -68,12 +72,11 @@ fun MemberScreen(
 @Composable
 private fun Content(
     attendanceCountUiState: AttendanceCountUiState,
+    attendanceListUiState: AttendanceListUiState,
     onPressMyInfo: () -> Unit,
     onPressQrcode: () -> Unit,
     onBackClicked: () -> Unit
 ) {
-    val schedules = getSchedules()
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -128,9 +131,14 @@ private fun Content(
                     Spacer(Modifier.height(16.dp))
                 }
             }
-            items(schedules) { schedule ->
-                ScheduleItem(schedule)
-                Spacer(Modifier.height(12.dp))
+
+            if (attendanceListUiState is AttendanceListUiState.Success) {
+                val attendances = attendanceListUiState.data
+
+                items(attendances) { attendance ->
+                    AttendanceItem(attendance)
+                    Spacer(Modifier.height(12.dp))
+                }
             }
         }
 
@@ -143,7 +151,7 @@ private fun Content(
 }
 
 @Composable
-private fun ScheduleItem(schedule: Schedule) {
+private fun AttendanceItem(attendance: Attendance) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -152,15 +160,15 @@ private fun ScheduleItem(schedule: Schedule) {
             .padding(16.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            ScheduleDateBox(schedule)
+            AttendanceDateBox(attendance)
             Spacer(Modifier.width(12.dp))
-            ScheduleDetails(schedule)
+            AttendanceDetails(attendance)
         }
     }
 }
 
 @Composable
-private fun ScheduleDateBox(schedule: Schedule) {
+private fun AttendanceDateBox(attendance: Attendance) {
     Box(
         modifier = Modifier
             .size(54.dp)
@@ -170,13 +178,13 @@ private fun ScheduleDateBox(schedule: Schedule) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             DDDText(
-                text = schedule.month,
+                text = "3",
                 color = DDD_BLACK,
                 textStyle = MaterialTheme.typography.bodySmall
             )
             Spacer(Modifier.height(4.dp))
             DDDText(
-                text = schedule.day,
+                text = "22",
                 color = DDD_BLACK,
                 textStyle = MaterialTheme.typography.titleSmall
             )
@@ -185,17 +193,17 @@ private fun ScheduleDateBox(schedule: Schedule) {
 }
 
 @Composable
-private fun ScheduleDetails(schedule: Schedule) {
+private fun AttendanceDetails(attendance: Attendance) {
     Column(verticalArrangement = Arrangement.Center) {
         DDDText(
-            text = schedule.title,
+            text = attendance.note,
             color = DDD_WHITE,
             textStyle = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(8.dp))
         DDDText(
-            text = schedule.content,
+            text = attendance.note,
             color = DDD_NEUTRAL_GRAY_20,
             textStyle = MaterialTheme.typography.bodySmall
         )
