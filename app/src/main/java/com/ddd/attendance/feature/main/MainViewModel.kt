@@ -20,7 +20,7 @@ class MainViewModel @Inject constructor(
     val startDestination: StateFlow<String> = _startDestination
 
     init {
-        viewModelScope.launch {
+        /*viewModelScope.launch {
             inviteTypeUseCase().collect {
                 val loginType = when (it) {
                     "member" -> ScreenName.MEMBER.name
@@ -29,6 +29,6 @@ class MainViewModel @Inject constructor(
                 }
                 _startDestination.value = loginType
             }
-        }
+        }*/
     }
 }

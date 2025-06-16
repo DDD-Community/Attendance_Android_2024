@@ -11,6 +11,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -29,6 +31,7 @@ import com.ddd.attendance.core.ui.theme.DDD_300
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.feature.login.LoginProcessViewModel
 import com.ddd.attendance.feature.login.ScreenName
+import com.ddd.attendance.feature.login.model.CheckEmailUiState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -43,6 +46,14 @@ fun LoginScreen(
 
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    val emailUiState by viewModel.checkEmailUiState.collectAsState()
+
+    LaunchedEffect(emailUiState) {
+        if (emailUiState is CheckEmailUiState.Success || emailUiState is CheckEmailUiState.Error) {
+            navController.navigate(route = ScreenName.INVITATION_CODE.name)
+        }
+    }
 
     LaunchedEffect(snackBarMessage) {
         snackBarMessage?.let {
@@ -60,7 +71,7 @@ fun LoginScreen(
         onClickGoogle = { // 로그인 성공 결과
             onClickGoogle { result ->
                 viewModel.setUpdateUser(result) // 유저 정보 저장
-                navController.navigate(route = ScreenName.INVITATION_CODE.name) // 초대 코드 입력 화면으로 전환
+                viewModel.checkEmail()
             }
         }
     )

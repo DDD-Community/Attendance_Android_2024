@@ -32,5 +32,9 @@ class DefaultInvitesRepository @Inject constructor(
 
     override fun getInviteType(): Flow<String> = inviteType
 
+    override suspend fun setInviteType() {
+        dataSource.updateAccountInviteType("")
+    }
+
     override fun getInviteCodeId(): Flow<String> = inviteCodeId
 }

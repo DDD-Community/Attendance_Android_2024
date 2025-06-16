@@ -4,12 +4,13 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ddd.attendance.core.domain.usecase.accounts.CheckEmailUseCase
 import com.ddd.attendance.core.domain.usecase.accounts.RegistrationUseCase
-import com.ddd.attendance.core.domain.usecase.invites.GetInviteCodeIdUseCase
 import com.ddd.attendance.core.domain.usecase.invites.ValidateUseCase
 import com.ddd.attendance.core.domain.usecase.profiles.PatchProfileMeUseCase
 import com.ddd.attendance.core.model.accounts.UserInfo
 import com.ddd.attendance.core.model.google.GoogleLogin
+import com.ddd.attendance.feature.login.model.CheckEmailUiState
 import com.ddd.attendance.feature.login.model.ProfileMeUiState
 import com.ddd.attendance.feature.login.model.RegistrationUiState
 import com.ddd.attendance.feature.login.model.ValidateUiState
@@ -26,8 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginProcessViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val getInviteCodeIdUseCase: GetInviteCodeIdUseCase,
     private val validateUseCase: ValidateUseCase,
+    private val checkEmailUseCase: CheckEmailUseCase,
     private val registrationUseCase: RegistrationUseCase,
     private val patchProfileMeUseCase: PatchProfileMeUseCase,
 ) : ViewModel() {
@@ -36,6 +37,9 @@ class LoginProcessViewModel @Inject constructor(
 
     private val _validateUiState = MutableStateFlow<ValidateUiState>(ValidateUiState.Empty)
     val validateUiState: StateFlow<ValidateUiState> = _validateUiState.asStateFlow()
+
+    private val _checkEmailUiState = MutableStateFlow<CheckEmailUiState>(CheckEmailUiState.Empty)
+    val checkEmailUiState: StateFlow<CheckEmailUiState> = _checkEmailUiState.asStateFlow()
 
     private val _registrationUiState = MutableStateFlow<RegistrationUiState>(RegistrationUiState.Empty)
     val registrationUiState: StateFlow<RegistrationUiState> = _registrationUiState.asStateFlow()
@@ -50,6 +54,7 @@ class LoginProcessViewModel @Inject constructor(
             uid = googleLogin.uid
         )
         Log.d("구글 로그인 결과", "name: ${googleLogin.name}, email: ${googleLogin.email}, uid: ${googleLogin.uid}")
+
     }
 
     private fun updateUserInfo(update: UserInfo.() -> UserInfo, logTag: String) {
@@ -114,6 +119,35 @@ class LoginProcessViewModel @Inject constructor(
                     }
             } catch (e: Exception) {
                 _registrationUiState.value = RegistrationUiState.Error(e.message ?: "Unknown error")
+            }
+        }
+    }
+
+    fun checkEmail() {
+        viewModelScope.launch {
+            try {
+                _checkEmailUiState.value = CheckEmailUiState.Loading
+
+                val userInfo = _userInfo.value
+
+                checkEmailUseCase(
+                    email = userInfo.email
+                )
+                    .filterNotNull()
+                    .map { CheckEmailUiState.Success(it) as CheckEmailUiState }
+                    .catch { emit(CheckEmailUiState.Error(it.message ?: "Unknown Error")) }
+                    .collect { state ->
+                        _checkEmailUiState.value = state
+
+                        if (state is CheckEmailUiState.Success) {
+                            Log.d("이미 가입된 회원", "${state.data.emailUsed} 로그인 진행 !")
+                        } else if(state is CheckEmailUiState.Error) {
+                            Log.d("신규 회원", "회원가입 진행 !")
+                        }
+                    }
+
+            } catch (e: Exception) {
+                _checkEmailUiState.value = CheckEmailUiState.Error(e.message ?: "Unknown error")
             }
         }
     }

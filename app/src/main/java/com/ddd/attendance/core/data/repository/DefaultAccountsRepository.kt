@@ -1,9 +1,12 @@
 package com.ddd.attendance.core.data.repository
 
 import com.ddd.attendance.core.data.api.AccountsApi
+import com.ddd.attendance.core.data.api.model.accounts.CheckEmailResponse
 import com.ddd.attendance.core.data.api.model.accounts.RegistrationResponse
+import com.ddd.attendance.core.data.api.request.accounts.CheckEmailRequest
 import com.ddd.attendance.core.data.api.request.accounts.RegistrationRequest
 import com.ddd.attendance.core.datastore.datasource.AccountPreferencesDataSource
+import com.ddd.attendance.core.model.accounts.CheckEmail
 import com.ddd.attendance.core.model.accounts.Registration
 import com.ddd.attendance.core.network.AccountsRepository
 import kotlinx.coroutines.flow.Flow
@@ -46,6 +49,17 @@ class DefaultAccountsRepository @Inject constructor(
 
         dataSource.updateAccountAccessToken(data.accessToken)
 
+        emit(data)
+    }
+
+    override fun checkEmail(email: String): Flow<CheckEmail> = flow {
+        val response = api.checkEmail(
+            request = CheckEmailRequest(
+                email = email
+            )
+        )
+
+        val data = CheckEmail.from(response.data)
         emit(data)
     }
 
