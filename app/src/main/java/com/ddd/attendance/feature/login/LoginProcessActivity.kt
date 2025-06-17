@@ -9,7 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
-import com.ddd.attendance.core.model.accounts.google.GoogleLogin
+import com.ddd.attendance.core.model.google.GoogleLogin
 import com.ddd.attendance.core.ui.theme.AttendanceTheme
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.google.android.gms.auth.api.signin.GoogleSignIn

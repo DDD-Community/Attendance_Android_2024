@@ -37,9 +37,9 @@ import com.ddd.attendance.core.utils.noRippleClickable
 fun DDDMemberSituation(
     modifier: Modifier = Modifier,
     radius: Dp = 20.dp,
-    attendanceCount: Int,
-    tardyCount: Int,
-    absentCount: Int
+    attendanceCount: Int = 0,
+    tardyCount: Int = 0,
+    absentCount: Int = 0
 ) {
     Box(
         modifier = modifier

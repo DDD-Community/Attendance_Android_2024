@@ -1,8 +1,8 @@
-package com.ddd.attendance.core.model.accounts
+package com.ddd.attendance.core.model.invites
 
 import com.ddd.attendance.core.data.api.model.invites.ValidateDataResponse
 
-class Validate(
+data class Validate(
     val valid: Boolean,
     val inviteCodeId: String,
     val inviteType: String,

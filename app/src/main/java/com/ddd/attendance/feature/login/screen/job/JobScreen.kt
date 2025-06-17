@@ -41,7 +41,7 @@ fun JobScreen(
 ) {
     Content(
         onClickNext = { jobRole ->
-            viewModel.setUpdateUserJobRole(value = jobRole)
+            viewModel.setUpdateUserRole(value = jobRole)
             navController.navigate(route = ScreenName.AFFILIATION.name)
         },
         onClickBackButton = {

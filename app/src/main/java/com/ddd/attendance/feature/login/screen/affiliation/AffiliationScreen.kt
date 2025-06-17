@@ -38,9 +38,7 @@ import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_20
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
 import com.ddd.attendance.feature.login.LoginProcessViewModel
-import com.ddd.attendance.feature.login.ScreenName
-import com.ddd.attendance.feature.login.model.RegistrationUiState
-import com.ddd.attendance.feature.login.model.ValidateUiState
+import com.ddd.attendance.feature.login.model.ProfileMeUiState
 import com.ddd.attendance.feature.main.MainActivity
 
 @Composable
@@ -51,14 +49,13 @@ fun AffiliationScreen(
     val context = LocalContext.current as? Activity
 
     val registrationUiState by viewModel.registrationUiState.collectAsState()
+    val profileMeUiState by viewModel.profileMeUiState.collectAsState()
 
-    LaunchedEffect(registrationUiState) {
-        if (registrationUiState is RegistrationUiState.Success) {
-            val result = (registrationUiState as RegistrationUiState.Success).data
-            val userId = result.user?.id ?: -1
-            val accessToken = result.accessToken
+    LaunchedEffect(profileMeUiState) {
+        if (profileMeUiState is ProfileMeUiState.Success) {
+            val result = (profileMeUiState as ProfileMeUiState.Success).data
 
-            if (userId != -1 && accessToken.isNotBlank()) {
+            if (result.id.isNotBlank()) {
                 context?.startActivity(Intent(context, MainActivity::class.java))
                 context?.finish()
             }

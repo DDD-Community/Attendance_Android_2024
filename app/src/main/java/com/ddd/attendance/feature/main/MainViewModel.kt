@@ -1,6 +1,5 @@
 package com.ddd.attendance.feature.main
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val inviteTypeUseCase: GetInviteTypeUseCase,
+    private val inviteTypeUseCase: GetInviteTypeUseCase
 ) : ViewModel() {
     private val _startDestination = MutableStateFlow("")
     val startDestination: StateFlow<String> = _startDestination
