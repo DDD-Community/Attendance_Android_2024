@@ -1,5 +1,6 @@
 package com.ddd.attendance.feature.login.screen.login
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +33,7 @@ import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.feature.login.LoginProcessViewModel
 import com.ddd.attendance.feature.login.ScreenName
 import com.ddd.attendance.feature.login.model.CheckEmailUiState
+import com.ddd.attendance.feature.login.model.LoginEmailUiState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -47,11 +49,22 @@ fun LoginScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val emailUiState by viewModel.checkEmailUiState.collectAsState()
+    val checkEmailUiState by viewModel.checkEmailUiState.collectAsState()
+    val loginEmailUiState by viewModel.loginEmailUiState.collectAsState()
 
-    LaunchedEffect(emailUiState) {
-        if (emailUiState is CheckEmailUiState.Success || emailUiState is CheckEmailUiState.Error) {
-            navController.navigate(route = ScreenName.INVITATION_CODE.name)
+    LaunchedEffect(checkEmailUiState) {
+        if (checkEmailUiState is CheckEmailUiState.Success) {
+            val isLogin = (checkEmailUiState as CheckEmailUiState.Success).data.emailUsed
+
+            if (isLogin) viewModel.loginEmail() //이메일 로그인 요청
+            else navController.navigate(route = ScreenName.INVITATION_CODE.name) // 신규회원 프로세스 ~
+        }
+    }
+
+    LaunchedEffect(loginEmailUiState) {
+        if (loginEmailUiState is LoginEmailUiState.Success) {
+            //로그인 요청 성공 ~ 메인으로 ~
+            Log.d("로그인 성공", "메인 화면으로 이동 !")
         }
     }
 
@@ -68,8 +81,8 @@ fun LoginScreen(
 
     Content(
         snackBarHostState = snackBarHostState,
-        onClickGoogle = { // 로그인 성공 결과
-            onClickGoogle { result ->
+        onClickGoogle = { //  로그인 성공 결과
+            onClickGoogle { result -> // google oauth result
                 viewModel.setUpdateUser(result) // 유저 정보 저장
                 viewModel.checkEmail()
             }

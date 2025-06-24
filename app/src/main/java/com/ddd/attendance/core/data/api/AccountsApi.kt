@@ -3,19 +3,27 @@ package com.ddd.attendance.core.data.api
 import com.ddd.attendance.core.data.ApiResponse
 import com.ddd.attendance.core.data.api.model.accounts.CheckEmailResponse
 import com.ddd.attendance.core.data.api.model.accounts.RegistrationResponse
+import com.ddd.attendance.core.data.api.model.accounts.TokenEmailResponse
 import com.ddd.attendance.core.data.api.request.accounts.CheckEmailRequest
 import com.ddd.attendance.core.data.api.request.accounts.RegistrationRequest
+import com.ddd.attendance.core.data.api.request.accounts.TokenEmailRequest
 import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface AccountsApi {
-    @POST("accounts/registration/")
-    suspend fun registration(
-        @Body request: RegistrationRequest
-    ): RegistrationResponse?
-
+    /** 회원 체크 API */
     @POST("accounts/check-email/")
     suspend fun checkEmail(
         @Body request: CheckEmailRequest
     ): ApiResponse<CheckEmailResponse>
+
+    @POST("/accounts/token/email/")
+    suspend fun loginEmail(
+        @Body request: TokenEmailRequest
+    ): ApiResponse<TokenEmailResponse>
+
+    @POST("accounts/registration/")
+    suspend fun registration(
+        @Body request: RegistrationRequest
+    ): RegistrationResponse?
 }

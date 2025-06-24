@@ -5,44 +5,56 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ddd.attendance.core.domain.usecase.accounts.CheckEmailUseCase
+import com.ddd.attendance.core.domain.usecase.accounts.LoginEmailUseCase
 import com.ddd.attendance.core.domain.usecase.accounts.RegistrationUseCase
 import com.ddd.attendance.core.domain.usecase.invites.ValidateUseCase
 import com.ddd.attendance.core.domain.usecase.profiles.PatchProfileMeUseCase
 import com.ddd.attendance.core.model.accounts.UserInfo
 import com.ddd.attendance.core.model.google.GoogleLogin
 import com.ddd.attendance.feature.login.model.CheckEmailUiState
+import com.ddd.attendance.feature.login.model.LoginEmailUiState
 import com.ddd.attendance.feature.login.model.ProfileMeUiState
 import com.ddd.attendance.feature.login.model.RegistrationUiState
 import com.ddd.attendance.feature.login.model.ValidateUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginProcessViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val validateUseCase: ValidateUseCase,
     private val checkEmailUseCase: CheckEmailUseCase,
+    private val loginEmailUseCase: LoginEmailUseCase,
     private val registrationUseCase: RegistrationUseCase,
+    private val validateUseCase: ValidateUseCase,
     private val patchProfileMeUseCase: PatchProfileMeUseCase,
 ) : ViewModel() {
     private val _userInfo = MutableStateFlow(UserInfo())
     val userInfo: StateFlow<UserInfo> = _userInfo.asStateFlow()
 
-    private val _validateUiState = MutableStateFlow<ValidateUiState>(ValidateUiState.Empty)
-    val validateUiState: StateFlow<ValidateUiState> = _validateUiState.asStateFlow()
-
     private val _checkEmailUiState = MutableStateFlow<CheckEmailUiState>(CheckEmailUiState.Empty)
     val checkEmailUiState: StateFlow<CheckEmailUiState> = _checkEmailUiState.asStateFlow()
 
+    private val _loginEmailUiState = MutableStateFlow<LoginEmailUiState>(LoginEmailUiState.Empty)
+    val loginEmailUiState: StateFlow<LoginEmailUiState> = _loginEmailUiState.asStateFlow()
+
     private val _registrationUiState = MutableStateFlow<RegistrationUiState>(RegistrationUiState.Empty)
     val registrationUiState: StateFlow<RegistrationUiState> = _registrationUiState.asStateFlow()
+
+    private val _validateUiState = MutableStateFlow<ValidateUiState>(ValidateUiState.Empty)
+    val validateUiState: StateFlow<ValidateUiState> = _validateUiState.asStateFlow()
 
     private val _profileMeUiState = MutableStateFlow<ProfileMeUiState>(ProfileMeUiState.Empty)
     val profileMeUiState: StateFlow<ProfileMeUiState> = _profileMeUiState.asStateFlow()
@@ -73,23 +85,76 @@ class LoginProcessViewModel @Inject constructor(
 
     fun setUpdateUserAffiliation(value: String) = updateUserInfo(update = { copy(affiliation = value) }, "유저 소속 업데이트")
 
-    fun inviteValidation(value: String) {
+    fun checkEmail() {
         viewModelScope.launch {
             try {
-                validateUseCase(inviteCode = value)
-                    .filterNotNull()
-                    .map { ValidateUiState.Success(it) as ValidateUiState }
-                    .catch { emit(ValidateUiState.Error(it.message ?: "Unknown Error")) }
-                    .collect { state ->
-                        _validateUiState.value = state
+                _checkEmailUiState.value = CheckEmailUiState.Loading
 
-                        if (state is ValidateUiState.Success) {
-                            setUpdateUserInviteType(state.data.inviteType)
-                            setUpdateUserInviteCodeId(state.data.inviteCodeId)
+                val userInfo = _userInfo.value
+
+                checkEmailUseCase(
+                    email = userInfo.email
+                )
+                    .filterNotNull()
+                    .map { CheckEmailUiState.Success(it) as CheckEmailUiState }
+                    .catch { emit(CheckEmailUiState.Error(it.message ?: "Unknown Error")) }
+                    .collect { state ->
+                        _checkEmailUiState.value = state
+
+                        if (state is CheckEmailUiState.Success) {
+                            Log.d("이미 가입된 회원", "${state.data.emailUsed} 로그인 진행 !")
+                        } else if(state is CheckEmailUiState.Error) {
+                            Log.d("신규 회원", "회원가입 진행 !")
+                        }
+                    }
+
+            } catch (e: Exception) {
+                _checkEmailUiState.value = CheckEmailUiState.Error(e.message ?: "Unknown error")
+            }
+        }
+    }
+
+    /*val loginEmailUiState: StateFlow<LoginEmailUiState> =
+        _userInfo
+            .map { it.email }
+            .distinctUntilChanged()
+            .filter { it.isNotBlank() }
+            .flatMapLatest { email ->
+                loginEmailUseCase(email)
+                    .filterNotNull()
+                    .map { LoginEmailUiState.Success(it) as LoginEmailUiState }
+                    .catch { emit(LoginEmailUiState.Error(it.message ?: "Unknown Error")) }
+                    .onStart { emit(LoginEmailUiState.Loading) }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = LoginEmailUiState.Loading
+            )*/
+
+    fun loginEmail() {
+        viewModelScope.launch {
+            try {
+                _loginEmailUiState.value = LoginEmailUiState.Loading
+
+                val userInfo = _userInfo.value
+
+                loginEmailUseCase(
+                    email = userInfo.email
+                ).filterNotNull()
+                    .map { LoginEmailUiState.Success(it) as LoginEmailUiState }
+                    .catch { emit(LoginEmailUiState.Error(it.message ?: "Unknown Error")) }
+                    .collect { state ->
+                        _loginEmailUiState.value = state
+
+                        if (state is LoginEmailUiState.Success) {
+                            Log.d("자동 로그인 성공", "${state.data.email} 로그인 진행 !")
+                        } else if(state is LoginEmailUiState.Error) {
+                            Log.d("자동 로그인 실패", "자동 로그인 실패 !")
                         }
                     }
             } catch (e: Exception) {
-                _validateUiState.value = ValidateUiState.Error(e.message ?: "Unknown error")
+                _loginEmailUiState.value = LoginEmailUiState.Error(e.message ?: "Unknown error")
             }
         }
     }
@@ -123,31 +188,23 @@ class LoginProcessViewModel @Inject constructor(
         }
     }
 
-    fun checkEmail() {
+    fun inviteValidation(value: String) {
         viewModelScope.launch {
             try {
-                _checkEmailUiState.value = CheckEmailUiState.Loading
-
-                val userInfo = _userInfo.value
-
-                checkEmailUseCase(
-                    email = userInfo.email
-                )
+                validateUseCase(inviteCode = value)
                     .filterNotNull()
-                    .map { CheckEmailUiState.Success(it) as CheckEmailUiState }
-                    .catch { emit(CheckEmailUiState.Error(it.message ?: "Unknown Error")) }
+                    .map { ValidateUiState.Success(it) as ValidateUiState }
+                    .catch { emit(ValidateUiState.Error(it.message ?: "Unknown Error")) }
                     .collect { state ->
-                        _checkEmailUiState.value = state
+                        _validateUiState.value = state
 
-                        if (state is CheckEmailUiState.Success) {
-                            Log.d("이미 가입된 회원", "${state.data.emailUsed} 로그인 진행 !")
-                        } else if(state is CheckEmailUiState.Error) {
-                            Log.d("신규 회원", "회원가입 진행 !")
+                        if (state is ValidateUiState.Success) {
+                            setUpdateUserInviteType(state.data.inviteType)
+                            setUpdateUserInviteCodeId(state.data.inviteCodeId)
                         }
                     }
-
             } catch (e: Exception) {
-                _checkEmailUiState.value = CheckEmailUiState.Error(e.message ?: "Unknown error")
+                _validateUiState.value = ValidateUiState.Error(e.message ?: "Unknown error")
             }
         }
     }

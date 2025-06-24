@@ -5,9 +5,11 @@ import com.ddd.attendance.core.data.api.model.accounts.CheckEmailResponse
 import com.ddd.attendance.core.data.api.model.accounts.RegistrationResponse
 import com.ddd.attendance.core.data.api.request.accounts.CheckEmailRequest
 import com.ddd.attendance.core.data.api.request.accounts.RegistrationRequest
+import com.ddd.attendance.core.data.api.request.accounts.TokenEmailRequest
 import com.ddd.attendance.core.datastore.datasource.AccountPreferencesDataSource
 import com.ddd.attendance.core.model.accounts.CheckEmail
 import com.ddd.attendance.core.model.accounts.Registration
+import com.ddd.attendance.core.model.accounts.TokenEmail
 import com.ddd.attendance.core.network.AccountsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -60,6 +62,17 @@ class DefaultAccountsRepository @Inject constructor(
         )
 
         val data = CheckEmail.from(response.data)
+        emit(data)
+    }
+
+    override fun loginEmail(email: String): Flow<TokenEmail>  = flow {
+        val response = api.loginEmail(
+            request = TokenEmailRequest(
+                email = email
+            )
+        )
+
+        val data = TokenEmail.from(response.data)
         emit(data)
     }
 
