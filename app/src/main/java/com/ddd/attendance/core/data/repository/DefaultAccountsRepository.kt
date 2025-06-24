@@ -21,6 +21,7 @@ class DefaultAccountsRepository @Inject constructor(
     private val dataSource: AccountPreferencesDataSource
 ) : AccountsRepository {
     private val accessToken: Flow<String> = dataSource.accountAccessToken
+    private val email: Flow<String> = dataSource.accountEmail
 
     override fun registration(
         owner: String,
@@ -45,10 +46,15 @@ class DefaultAccountsRepository @Inject constructor(
                 user = null
             )
         )
+
+        //이메일, id, accessToken 저장
+
+        data.user?.email?.let {
+            dataSource.updateEmail(it)
+        }
         data.user?.id?.let {
             dataSource.updateAccountUserId(it)
         }
-
         dataSource.updateAccountAccessToken(data.accessToken)
 
         emit(data)
@@ -77,6 +83,12 @@ class DefaultAccountsRepository @Inject constructor(
     }
 
     override fun getAccessToken(): Flow<String> {
+        return email.filter {
+            it.isNotBlank()
+        }
+    }
+
+    override fun getEmail(): Flow<String> {
         return accessToken.filter {
             it.isNotBlank()
         }

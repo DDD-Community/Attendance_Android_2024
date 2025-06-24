@@ -16,6 +16,7 @@ class DefaultAccountPreferencesDataSource @Inject constructor (
 ): AccountPreferencesDataSource {
     object PreferencesKey {
         val ACCOUNT_ACCESS_TOKEN = stringPreferencesKey("ACCOUNT_ACCESS_TOKEN")
+        val ACCOUNT_EMAIL = stringPreferencesKey("ACCOUNT_EMAIL")
         val ACCOUNT_INVITE_TYPE = stringPreferencesKey("ACCOUNT_INVITE_TYPE")
         val ACCOUNT_INVITE_CODE_ID = stringPreferencesKey("ACCOUNT_INVITE_CODE_ID")
         val ACCOUNT_USER_ID = intPreferencesKey("ACCOUNT_USER_ID")
@@ -29,6 +30,17 @@ class DefaultAccountPreferencesDataSource @Inject constructor (
         dataStore.edit { preferences ->
             preferences[PreferencesKey.ACCOUNT_ACCESS_TOKEN] = accessToken
             Log.e("Datastore 액세스 토큰", "${preferences[PreferencesKey.ACCOUNT_ACCESS_TOKEN]}")
+        }
+    }
+
+    override val accountEmail: Flow<String> = dataStore.data.map { preferences ->
+        preferences[PreferencesKey.ACCOUNT_EMAIL] ?: ""
+    }
+
+    override suspend fun updateEmail(email: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKey.ACCOUNT_EMAIL] = email
+            Log.e("Datastore 이메일", "${preferences[PreferencesKey.ACCOUNT_EMAIL]}")
         }
     }
 

@@ -10,5 +10,6 @@ interface AccountsRepository {
     fun loginEmail(email: String): Flow<TokenEmail>
     fun registration(owner: String, email: String, password1: String, password2: String): Flow<Registration>
 
+    fun getEmail(): Flow<String>
     fun getAccessToken(): Flow<String>
 }

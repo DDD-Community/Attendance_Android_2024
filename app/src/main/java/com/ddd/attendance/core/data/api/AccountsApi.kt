@@ -17,11 +17,13 @@ interface AccountsApi {
         @Body request: CheckEmailRequest
     ): ApiResponse<CheckEmailResponse>
 
+    /** 로그인 API */
     @POST("/accounts/token/email/")
     suspend fun loginEmail(
         @Body request: TokenEmailRequest
     ): ApiResponse<TokenEmailResponse>
 
+    /** 회원 가입 API */
     @POST("accounts/registration/")
     suspend fun registration(
         @Body request: RegistrationRequest
