@@ -1,5 +1,6 @@
 package com.ddd.attendance.feature.login.screen.login
 
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,16 +25,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityOptionsCompat
 import androidx.navigation.NavController
 import com.ddd.attendance.R
 import com.ddd.attendance.core.designsystem.DDDText
 import com.ddd.attendance.core.model.google.GoogleLogin
 import com.ddd.attendance.core.ui.theme.DDD_300
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
+import com.ddd.attendance.feature.login.LoginProcessActivity
 import com.ddd.attendance.feature.login.LoginProcessViewModel
 import com.ddd.attendance.feature.login.ScreenName
 import com.ddd.attendance.feature.login.model.CheckEmailUiState
 import com.ddd.attendance.feature.login.model.LoginEmailUiState
+import com.ddd.attendance.feature.login.model.ProfileMeUiState
+import com.ddd.attendance.feature.main.MainActivity
 import kotlinx.coroutines.launch
 
 @Composable
@@ -45,7 +50,6 @@ fun LoginScreen(
     onClickGoogle: (result: (GoogleLogin) -> Unit) -> Unit
 ) {
     val context = LocalContext.current
-
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -54,17 +58,22 @@ fun LoginScreen(
 
     LaunchedEffect(checkEmailUiState) {
         if (checkEmailUiState is CheckEmailUiState.Success) {
-            val isLogin = (checkEmailUiState as CheckEmailUiState.Success).data.emailUsed
+            val isEmailUsed = (checkEmailUiState as CheckEmailUiState.Success).data.emailUsed
 
-            if (isLogin) viewModel.loginEmail() //이메일 로그인 요청
-            else navController.navigate(route = ScreenName.INVITATION_CODE.name) // 신규회원 프로세스 ~
+            if (isEmailUsed) { //기존 회원
+                viewModel.loginEmail()
+            }
+            else { // 신규회원 프로세스
+                navController.navigate(route = ScreenName.INVITATION_CODE.name)
+                viewModel.resetCheckEmailUiState()
+            }
         }
     }
 
     LaunchedEffect(loginEmailUiState) {
         if (loginEmailUiState is LoginEmailUiState.Success) {
-            //로그인 요청 성공 ~ 메인으로 ~
-            Log.d("로그인 성공", "메인 화면으로 이동 !")
+            val options = ActivityOptionsCompat.makeCustomAnimation(context, android.R.anim.fade_in, android.R.anim.fade_out)
+            context.startActivity(Intent(context, MainActivity::class.java), options.toBundle())
         }
     }
 

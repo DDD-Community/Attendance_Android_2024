@@ -8,6 +8,7 @@ import com.ddd.attendance.core.domain.usecase.accounts.CheckEmailUseCase
 import com.ddd.attendance.core.domain.usecase.accounts.LoginEmailUseCase
 import com.ddd.attendance.core.domain.usecase.accounts.RegistrationUseCase
 import com.ddd.attendance.core.domain.usecase.invites.ValidateUseCase
+import com.ddd.attendance.core.domain.usecase.profiles.GetProfileMeUseCase
 import com.ddd.attendance.core.domain.usecase.profiles.PatchProfileMeUseCase
 import com.ddd.attendance.core.model.accounts.UserInfo
 import com.ddd.attendance.core.model.google.GoogleLogin
@@ -16,19 +17,14 @@ import com.ddd.attendance.feature.login.model.LoginEmailUiState
 import com.ddd.attendance.feature.login.model.ProfileMeUiState
 import com.ddd.attendance.feature.login.model.RegistrationUiState
 import com.ddd.attendance.feature.login.model.ValidateUiState
+import com.ddd.attendance.feature.main.screen.ScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -40,6 +36,7 @@ class LoginProcessViewModel @Inject constructor(
     private val registrationUseCase: RegistrationUseCase,
     private val validateUseCase: ValidateUseCase,
     private val patchProfileMeUseCase: PatchProfileMeUseCase,
+    private val getProfileMeUseCase: GetProfileMeUseCase
 ) : ViewModel() {
     private val _userInfo = MutableStateFlow(UserInfo())
     val userInfo: StateFlow<UserInfo> = _userInfo.asStateFlow()
@@ -100,12 +97,6 @@ class LoginProcessViewModel @Inject constructor(
                     .catch { emit(CheckEmailUiState.Error(it.message ?: "Unknown Error")) }
                     .collect { state ->
                         _checkEmailUiState.value = state
-
-                        if (state is CheckEmailUiState.Success) {
-                            Log.d("이미 가입된 회원", "${state.data.emailUsed} 로그인 진행 !")
-                        } else if(state is CheckEmailUiState.Error) {
-                            Log.d("신규 회원", "회원가입 진행 !")
-                        }
                     }
 
             } catch (e: Exception) {
@@ -113,24 +104,6 @@ class LoginProcessViewModel @Inject constructor(
             }
         }
     }
-
-    /*val loginEmailUiState: StateFlow<LoginEmailUiState> =
-        _userInfo
-            .map { it.email }
-            .distinctUntilChanged()
-            .filter { it.isNotBlank() }
-            .flatMapLatest { email ->
-                loginEmailUseCase(email)
-                    .filterNotNull()
-                    .map { LoginEmailUiState.Success(it) as LoginEmailUiState }
-                    .catch { emit(LoginEmailUiState.Error(it.message ?: "Unknown Error")) }
-                    .onStart { emit(LoginEmailUiState.Loading) }
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = LoginEmailUiState.Loading
-            )*/
 
     fun loginEmail() {
         viewModelScope.launch {
@@ -146,12 +119,6 @@ class LoginProcessViewModel @Inject constructor(
                     .catch { emit(LoginEmailUiState.Error(it.message ?: "Unknown Error")) }
                     .collect { state ->
                         _loginEmailUiState.value = state
-
-                        if (state is LoginEmailUiState.Success) {
-                            Log.d("자동 로그인 성공", "${state.data.email} 로그인 진행 !")
-                        } else if(state is LoginEmailUiState.Error) {
-                            Log.d("자동 로그인 실패", "자동 로그인 실패 !")
-                        }
                     }
             } catch (e: Exception) {
                 _loginEmailUiState.value = LoginEmailUiState.Error(e.message ?: "Unknown error")
@@ -179,7 +146,7 @@ class LoginProcessViewModel @Inject constructor(
                         _registrationUiState.value = state
 
                         if (state is RegistrationUiState.Success) {
-                            launchProfileMeUpdate()
+                            patchProfileMe()
                         }
                     }
             } catch (e: Exception) {
@@ -213,8 +180,11 @@ class LoginProcessViewModel @Inject constructor(
         _validateUiState.value = ValidateUiState.Empty
     }
 
+    fun resetCheckEmailUiState() {
+        _checkEmailUiState.value = CheckEmailUiState.Empty
+    }
 
-    private fun launchProfileMeUpdate() {
+    private fun patchProfileMe() {
         viewModelScope.launch {
             try {
                 patchProfileMeUseCase(

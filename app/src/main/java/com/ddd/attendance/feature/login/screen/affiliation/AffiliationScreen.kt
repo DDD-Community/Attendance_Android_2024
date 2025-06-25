@@ -48,7 +48,6 @@ fun AffiliationScreen(
 ) {
     val context = LocalContext.current as? Activity
 
-    val registrationUiState by viewModel.registrationUiState.collectAsState()
     val profileMeUiState by viewModel.profileMeUiState.collectAsState()
 
     LaunchedEffect(profileMeUiState) {

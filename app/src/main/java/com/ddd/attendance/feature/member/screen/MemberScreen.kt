@@ -40,7 +40,6 @@ import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_BLUE_20
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_20
 import com.ddd.attendance.core.ui.theme.DDD_NEUTRAL_GRAY_90
 import com.ddd.attendance.core.ui.theme.DDD_WHITE
-import com.ddd.attendance.feature.login.model.ProfileMeUiState
 import com.ddd.attendance.feature.main.model.attendance.AttendanceCountUiState
 import com.ddd.attendance.feature.main.model.attendance.AttendanceListUiState
 import com.ddd.attendance.feature.main.screen.ScreenName
@@ -48,13 +47,12 @@ import com.ddd.attendance.feature.member.MemberViewModel
 
 @Composable
 fun MemberScreen(
+    userName: String,
     navController: NavController,
     viewModel: MemberViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-
-    val profileMeUiState by viewModel.profileMeUiState.collectAsState()
     val attendanceCountUiState by viewModel.attendanceCountUiState.collectAsState()
     val attendanceListUiState by viewModel.attendanceListUiState.collectAsState()
 
@@ -62,7 +60,7 @@ fun MemberScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         Content(
-            profileMeUiState = profileMeUiState,
+            userName = userName,
             attendanceCountUiState = attendanceCountUiState,
             attendanceListUiState = attendanceListUiState,
             onPressQrcode = { navController.navigate(ScreenName.QR_IMAGE.name) },
@@ -74,7 +72,7 @@ fun MemberScreen(
 
 @Composable
 private fun Content(
-    profileMeUiState: ProfileMeUiState,
+    userName: String,
     attendanceCountUiState: AttendanceCountUiState,
     attendanceListUiState: AttendanceListUiState,
     onPressMyInfo: () -> Unit,
@@ -96,26 +94,22 @@ private fun Content(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Column {
-                    if (profileMeUiState is ProfileMeUiState.Success) {
-                        val name = profileMeUiState.data.name
+                    DDDText(
+                        text = stringResource(R.string.member_attendance_status, userName),
+                        color = DDD_WHITE,
+                        textStyle = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
 
-                        DDDText(
-                            text = stringResource(R.string.member_attendance_status, name),
-                            color = DDD_WHITE,
-                            textStyle = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
+                    Spacer(Modifier.height(16.dp))
 
-                        Spacer(Modifier.height(16.dp))
+                    DDDText(
+                        text = stringResource(R.string.member_activity_period, "2025.03.12 ~ 2025.08.30"),
+                        color = DDD_NEUTRAL_GRAY_20,
+                        textStyle = MaterialTheme.typography.bodySmall
+                    )
 
-                        DDDText(
-                            text = stringResource(R.string.member_activity_period, "2025.03.12 ~ 2025.08.30"),
-                            color = DDD_NEUTRAL_GRAY_20,
-                            textStyle = MaterialTheme.typography.bodySmall
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-                    }
+                    Spacer(Modifier.height(8.dp))
 
                     if (attendanceCountUiState is AttendanceCountUiState.Success) {
                         attendanceCountUiState.data.apply {

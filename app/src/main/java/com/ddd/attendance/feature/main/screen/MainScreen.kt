@@ -22,6 +22,7 @@ fun MainScreen() {
     val viewModel: MainViewModel = hiltViewModel()
 
     val startDestination by viewModel.startDestination.collectAsState()
+    val userName by viewModel.userName.collectAsState()
 
     if (startDestination.isNotBlank()) {
         Column {
@@ -31,6 +32,7 @@ fun MainScreen() {
             ) {
                 composable(route = ScreenName.MEMBER.name) {
                     MemberScreen(
+                        userName = userName,
                         navController = navController
                     )
                 }
@@ -69,5 +71,5 @@ fun MainScreen() {
 }
 
 enum class ScreenName {
-    MEMBER, ADMIN, NONE, QR_IMAGE, QR_SCAN, MY_PAGE, ADD_SCHEDULE
+    LOGIN, MEMBER, ADMIN, NONE, QR_IMAGE, QR_SCAN, MY_PAGE, ADD_SCHEDULE
 }
