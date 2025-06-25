@@ -1,7 +1,6 @@
 package com.ddd.attendance.core.data.repository
 
 import com.ddd.attendance.core.data.api.AccountsApi
-import com.ddd.attendance.core.data.api.model.accounts.CheckEmailResponse
 import com.ddd.attendance.core.data.api.model.accounts.RegistrationResponse
 import com.ddd.attendance.core.data.api.request.accounts.CheckEmailRequest
 import com.ddd.attendance.core.data.api.request.accounts.RegistrationRequest
@@ -79,17 +78,24 @@ class DefaultAccountsRepository @Inject constructor(
         )
 
         val data = TokenEmail.from(response.data)
+
+        dataSource.apply {
+            updateEmail(data.email)
+            updateAccountUserId(data.id)
+            updateAccountAccessToken(data.accessToken)
+        }
+
         emit(data)
     }
 
     override fun getAccessToken(): Flow<String> {
-        return email.filter {
+        return accessToken.filter {
             it.isNotBlank()
         }
     }
 
     override fun getEmail(): Flow<String> {
-        return accessToken.filter {
+        return email.filter {
             it.isNotBlank()
         }
     }
