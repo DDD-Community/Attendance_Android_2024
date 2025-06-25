@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
 import com.airbnb.lottie.LottieComposition
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -31,10 +30,11 @@ fun SplashScreen(
     val animState by animateLottieCompositionAsState(composition = composition, iterations = 1)
 
     LaunchedEffect(animState) {
-        if (animState == 1f) {
+        if (animState == 1f ) {
             goNext(nextScreen)
         }
     }
+
     Content(composition)
 }
 

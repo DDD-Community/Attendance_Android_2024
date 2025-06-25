@@ -23,8 +23,12 @@ class SplashActivity : ComponentActivity() {
                     goNext = { screenName ->
                         val options = ActivityOptionsCompat.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out)
                         when(screenName) {
-                            ScreenName.MEMBER.name, ScreenName.ADMIN.name -> startActivity(Intent(this, MainActivity::class.java), options.toBundle())
-                            else -> startActivity(Intent(this, LoginProcessActivity::class.java), options.toBundle())
+                            ScreenName.MEMBER.name, ScreenName.ADMIN.name -> {
+                                startActivity(Intent(this, MainActivity::class.java), options.toBundle())
+                            }
+                            else -> {
+                                startActivity(Intent(this, LoginProcessActivity::class.java), options.toBundle())
+                            }
                         }
                         finish()
                     }
