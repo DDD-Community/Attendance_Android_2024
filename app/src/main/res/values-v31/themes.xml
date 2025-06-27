@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Attendance" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- 시스템 기본 스플래시 제거 -->
+        <item name="android:windowSplashScreenBackground">@android:color/transparent</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@null</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+
+        <!-- 필요 시 status bar 배경 투명 설정 -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>

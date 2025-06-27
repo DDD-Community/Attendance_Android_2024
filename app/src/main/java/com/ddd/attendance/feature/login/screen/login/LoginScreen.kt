@@ -1,5 +1,6 @@
 package com.ddd.attendance.feature.login.screen.login
 
+import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -49,7 +50,7 @@ fun LoginScreen(
     onDismissSnackBar: () -> Unit,
     onClickGoogle: (result: (GoogleLogin) -> Unit) -> Unit
 ) {
-    val context = LocalContext.current
+    val context = LocalContext.current as? Activity
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -72,8 +73,11 @@ fun LoginScreen(
 
     LaunchedEffect(loginEmailUiState) {
         if (loginEmailUiState is LoginEmailUiState.Success) {
-            val options = ActivityOptionsCompat.makeCustomAnimation(context, android.R.anim.fade_in, android.R.anim.fade_out)
-            context.startActivity(Intent(context, MainActivity::class.java), options.toBundle())
+            context?.let {
+                val options = ActivityOptionsCompat.makeCustomAnimation(it, android.R.anim.fade_in, android.R.anim.fade_out)
+                it.startActivity(Intent(context, MainActivity::class.java), options.toBundle())
+                it.finish()
+            }
         }
     }
 

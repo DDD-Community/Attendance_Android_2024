@@ -14,27 +14,25 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SplashActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             AttendanceTheme {
-                SplashScreen(
-                    goNext = { screenName ->
-                        val options = ActivityOptionsCompat.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out)
-                        when(screenName) {
-                            ScreenName.MEMBER.name, ScreenName.ADMIN.name -> {
-                                startActivity(Intent(this, MainActivity::class.java), options.toBundle())
-                            }
-                            else -> {
-                                startActivity(Intent(this, LoginProcessActivity::class.java), options.toBundle())
-                            }
-                        }
-                        finish()
-                    }
-                )
+                SplashScreen(goNext = ::navigateToNextScreen)
             }
         }
     }
-}
 
+    private fun navigateToNextScreen(screenName: String) {
+        val intent = when (screenName) {
+            ScreenName.MEMBER.name, ScreenName.ADMIN.name -> Intent(this, MainActivity::class.java)
+            else -> Intent(this, LoginProcessActivity::class.java)
+        }
+        val options = ActivityOptionsCompat.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out)
+
+        startActivity(intent, options.toBundle())
+        finish()
+    }
+}

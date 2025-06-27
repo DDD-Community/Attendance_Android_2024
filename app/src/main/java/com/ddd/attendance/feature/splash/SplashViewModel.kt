@@ -19,18 +19,19 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
     private val getEmailUseCase: GetEmailUseCase,
     private val getAccessTokenUseCase: GetAccessTokenUseCase,
     private val loginEmailUseCase: LoginEmailUseCase,
     private val getProfileMeUseCase: GetProfileMeUseCase
 ) : ViewModel() {
-    private val _screenType: MutableStateFlow<String> = MutableStateFlow("")
+
+    private val _screenType = MutableStateFlow<String>("")
     val screenType: StateFlow<String> = _screenType.asStateFlow()
 
     private val _loginEmailUiState = MutableStateFlow<LoginEmailUiState>(LoginEmailUiState.Empty)
@@ -40,66 +41,50 @@ class SplashViewModel @Inject constructor(
     val profileMeUiState: StateFlow<ProfileMeUiState> = _profileMeUiState.asStateFlow()
 
     init {
+        checkUserCredentials()
+    }
+
+    private fun checkUserCredentials() {
         viewModelScope.launch {
-            combine(
-                getEmailUseCase(),
-                getAccessTokenUseCase()
-            ) { email, token ->
+            combine(getEmailUseCase(), getAccessTokenUseCase()) { email, token ->
                 email to token
             }.collect { (email, token) ->
-                if (email.isEmpty() || token.isEmpty()) {
-                    // 이메일이나 토큰이 없으면 신규 → 로그인 화면
+                if (email.isBlank() || token.isBlank()) {
                     _screenType.value = ScreenName.LOGIN.name
                 } else {
-                    // 이메일, 토큰 있으면 기존 유저 → 메인 화면
-                    loginEmail(email)
+                    attemptLogin(email)
                 }
             }
         }
     }
 
-    private fun loginEmail(email: String) {
+    private fun attemptLogin(email: String) {
         viewModelScope.launch {
-            try {
-                _loginEmailUiState.value = LoginEmailUiState.Loading
-
-                loginEmailUseCase(email = email)
-                    .filterNotNull()
-                    .map { LoginEmailUiState.Success(it) as LoginEmailUiState }
-                    .catch { emit(LoginEmailUiState.Error(it.message ?: "Unknown Error")) }
-                    .collect { state ->
-                        _loginEmailUiState.value = state
-
-                        if (state is LoginEmailUiState.Success) profileMe()
-                    }
-            } catch (e: Exception) {
-                _loginEmailUiState.value = LoginEmailUiState.Error(e.message ?: "Unknown error")
-            }
+            loginEmailUseCase(email)
+                .onStart { _loginEmailUiState.value = LoginEmailUiState.Loading }
+                .filterNotNull()
+                .map { LoginEmailUiState.Success(it) as LoginEmailUiState }
+                .catch { e -> _loginEmailUiState.value = LoginEmailUiState.Error(e.message ?: "Unknown error") }
+                .collect { state ->
+                    _loginEmailUiState.value = state
+                    if (state is LoginEmailUiState.Success) fetchUserProfile()
+                }
         }
     }
 
-    private fun profileMe() {
+    private fun fetchUserProfile() {
         viewModelScope.launch {
-            try {
-                _profileMeUiState.value = ProfileMeUiState.Loading
-                getProfileMeUseCase()
-                    .filterNotNull()
-                    .map { ProfileMeUiState.Success(it) as ProfileMeUiState }
-                    .catch { emit(ProfileMeUiState.Error(it.message ?: "Unknown Error")) }
-                    .collect { state ->
-                        _profileMeUiState.value = state
-
-                        if (state is ProfileMeUiState.Success) {
-                            if (state.data.isStaff) {
-                                _screenType.value = ScreenName.ADMIN.name
-                            } else {
-                                _screenType.value = ScreenName.MEMBER.name
-                            }
-                        }
+            getProfileMeUseCase()
+                .onStart { _profileMeUiState.value = ProfileMeUiState.Loading }
+                .filterNotNull()
+                .map { ProfileMeUiState.Success(it) as ProfileMeUiState }
+                .catch { e -> _profileMeUiState.value = ProfileMeUiState.Error(e.message ?: "Unknown error") }
+                .collect { state ->
+                    _profileMeUiState.value = state
+                    if (state is ProfileMeUiState.Success) {
+                        _screenType.value = if (state.data.isStaff) ScreenName.ADMIN.name else ScreenName.MEMBER.name
                     }
-            } catch (e: Exception) {
-                _profileMeUiState.value = ProfileMeUiState.Error(e.message ?: "Unknown error")
-            }
+                }
         }
     }
 }
