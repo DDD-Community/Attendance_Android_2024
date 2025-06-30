@@ -12,7 +12,7 @@ import retrofit2.http.POST
 
 interface AccountsApi {
     /** 회원 체크 API */
-    @POST("accounts/check-email/")
+    @POST("/accounts/check-email/")
     suspend fun checkEmail(
         @Body request: CheckEmailRequest
     ): ApiResponse<CheckEmailResponse>
@@ -24,7 +24,7 @@ interface AccountsApi {
     ): ApiResponse<TokenEmailResponse>
 
     /** 회원 가입 API */
-    @POST("accounts/registration/")
+    @POST("/accounts/registration/")
     suspend fun registration(
         @Body request: RegistrationRequest
     ): RegistrationResponse?
