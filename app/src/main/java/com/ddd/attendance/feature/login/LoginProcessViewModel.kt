@@ -17,14 +17,20 @@ import com.ddd.attendance.feature.login.model.LoginEmailUiState
 import com.ddd.attendance.feature.login.model.ProfileMeUiState
 import com.ddd.attendance.feature.login.model.RegistrationUiState
 import com.ddd.attendance.feature.login.model.ValidateUiState
-import com.ddd.attendance.feature.main.screen.ScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,14 +44,85 @@ class LoginProcessViewModel @Inject constructor(
     private val patchProfileMeUseCase: PatchProfileMeUseCase,
     private val getProfileMeUseCase: GetProfileMeUseCase
 ) : ViewModel() {
+
+    private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
+    val uiState = _uiState
+        .onEach { state ->
+            when (state) {
+                is UiState.Success -> {
+                    setUpdateUser(state.googleLogin)
+                    checkEmail()
+                }
+                else -> {}
+            }
+
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000L),
+            UiState.Loading
+        )
+
+    private val _navigateToInvitation = MutableSharedFlow<Unit>()
+    val navigateToInvitation: SharedFlow<Unit> = _navigateToInvitation.asSharedFlow()
+
+    private fun navigateToInvitation() {
+        viewModelScope.launch {
+            _navigateToInvitation.emit(Unit)
+        }
+    }
+
+    private val _openMainActivity = MutableSharedFlow<Unit>()
+    val openMainActivity: SharedFlow<Unit> = _openMainActivity.asSharedFlow()
+
+    private fun openMainActivity() {
+        viewModelScope.launch {
+            _openMainActivity.emit(Unit)
+        }
+    }
+
     private val _userInfo = MutableStateFlow(UserInfo())
     val userInfo: StateFlow<UserInfo> = _userInfo.asStateFlow()
 
     private val _checkEmailUiState = MutableStateFlow<CheckEmailUiState>(CheckEmailUiState.Empty)
-    val checkEmailUiState: StateFlow<CheckEmailUiState> = _checkEmailUiState.asStateFlow()
+    val checkEmailUiState = _checkEmailUiState
+        .onEach { state ->
+            when (state) {
+                is CheckEmailUiState.Success -> {
+                    val isEmailUsed = state.data.emailUsed
+
+                    if (isEmailUsed) { //기존 회원
+                        loginEmail()
+                    }
+                    else { // 신규회원 프로세스
+                        navigateToInvitation()
+                        resetCheckEmailUiState()
+                    }
+                }
+                else -> {}
+            }
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000L),
+            UiState.Loading
+        )
 
     private val _loginEmailUiState = MutableStateFlow<LoginEmailUiState>(LoginEmailUiState.Empty)
-    val loginEmailUiState: StateFlow<LoginEmailUiState> = _loginEmailUiState.asStateFlow()
+    val loginEmailUiState = _loginEmailUiState
+        .onEach { state ->
+            when (state) {
+                is LoginEmailUiState.Success -> {
+                    openMainActivity()
+                }
+                else -> {}
+            }
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000L),
+            UiState.Loading
+        )
 
     private val _registrationUiState = MutableStateFlow<RegistrationUiState>(RegistrationUiState.Empty)
     val registrationUiState: StateFlow<RegistrationUiState> = _registrationUiState.asStateFlow()
@@ -205,4 +282,16 @@ class LoginProcessViewModel @Inject constructor(
             }
         }
     }
+
+    fun setUiState(uiState: UiState) {
+        viewModelScope.launch {
+            _uiState.emit(uiState)
+        }
+    }
+}
+
+sealed interface UiState {
+    data class Success(val googleLogin: GoogleLogin) : UiState
+    data class Error(val error: String?) : UiState
+    data object Loading : UiState
 }
