@@ -1,5 +1,8 @@
 package com.ddd.attendance.feature.login.screen.login
 
+import android.app.Activity
+import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,6 +14,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -21,14 +26,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityOptionsCompat
 import androidx.navigation.NavController
 import com.ddd.attendance.R
 import com.ddd.attendance.core.designsystem.DDDText
 import com.ddd.attendance.core.model.google.GoogleLogin
 import com.ddd.attendance.core.ui.theme.DDD_300
 import com.ddd.attendance.core.ui.theme.DDD_BLACK
+import com.ddd.attendance.feature.login.LoginProcessActivity
 import com.ddd.attendance.feature.login.LoginProcessViewModel
 import com.ddd.attendance.feature.login.ScreenName
+import com.ddd.attendance.feature.login.model.CheckEmailUiState
+import com.ddd.attendance.feature.login.model.LoginEmailUiState
+import com.ddd.attendance.feature.login.model.ProfileMeUiState
+import com.ddd.attendance.feature.main.MainActivity
 import kotlinx.coroutines.launch
 
 @Composable
@@ -39,10 +50,36 @@ fun LoginScreen(
     onDismissSnackBar: () -> Unit,
     onClickGoogle: (result: (GoogleLogin) -> Unit) -> Unit
 ) {
-    val context = LocalContext.current
-
+    val context = LocalContext.current as? Activity
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    val checkEmailUiState by viewModel.checkEmailUiState.collectAsState()
+    val loginEmailUiState by viewModel.loginEmailUiState.collectAsState()
+
+    LaunchedEffect(checkEmailUiState) {
+        if (checkEmailUiState is CheckEmailUiState.Success) {
+            val isEmailUsed = (checkEmailUiState as CheckEmailUiState.Success).data.emailUsed
+
+            if (isEmailUsed) { //기존 회원
+                viewModel.loginEmail()
+            }
+            else { // 신규회원 프로세스
+                navController.navigate(route = ScreenName.INVITATION_CODE.name)
+                viewModel.resetCheckEmailUiState()
+            }
+        }
+    }
+
+    LaunchedEffect(loginEmailUiState) {
+        if (loginEmailUiState is LoginEmailUiState.Success) {
+            context?.let {
+                val options = ActivityOptionsCompat.makeCustomAnimation(it, android.R.anim.fade_in, android.R.anim.fade_out)
+                it.startActivity(Intent(context, MainActivity::class.java), options.toBundle())
+                it.finish()
+            }
+        }
+    }
 
     LaunchedEffect(snackBarMessage) {
         snackBarMessage?.let {
@@ -57,10 +94,10 @@ fun LoginScreen(
 
     Content(
         snackBarHostState = snackBarHostState,
-        onClickGoogle = { // 로그인 성공 결과
-            onClickGoogle { result ->
+        onClickGoogle = { //  로그인 성공 결과
+            onClickGoogle { result -> // google oauth result
                 viewModel.setUpdateUser(result) // 유저 정보 저장
-                navController.navigate(route = ScreenName.INVITATION_CODE.name) // 초대 코드 입력 화면으로 전환
+                viewModel.checkEmail()
             }
         }
     )

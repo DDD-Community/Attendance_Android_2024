@@ -11,7 +11,7 @@
 
     <application
         android:name=".application.DDDApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -20,12 +20,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Attendance"
         tools:targetApi="31">
-        <activity
-            android:name=".feature.login.LoginProcessActivity"
+        <activity android:name=".feature.splash.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.Attendance"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize"
             tools:ignore="DiscouragedApi,LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,7 +33,16 @@
         </activity>
 
         <activity
+            android:name=".feature.login.LoginProcessActivity"
+            android:theme="@style/Theme.Attendance"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity">
+        </activity>
+
+        <activity
             android:name=".feature.main.MainActivity"
+            android:theme="@style/Theme.Attendance"
             android:screenOrientation="portrait"
             tools:ignore="DiscouragedApi,LockedOrientationActivity">
         </activity>

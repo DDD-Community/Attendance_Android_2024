@@ -46,7 +46,7 @@ object ApiModule {
         gsonConverterFactory: GsonConverterFactory,
     ): Retrofit = Retrofit.Builder()
         .client(okHttpClient)
-        .baseUrl("https://home.ufxpri.dev/")
+        .baseUrl("https://home.ufxpri.dev")
         .addConverterFactory(gsonConverterFactory)
         .build()
 

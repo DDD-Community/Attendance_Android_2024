@@ -3,9 +3,12 @@ package com.ddd.attendance.core.datastore.datasource
 import kotlinx.coroutines.flow.Flow
 
 interface AccountPreferencesDataSource {
-    //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5NjkzNjk4LCJpYXQiOjE3NDk2MDcyOTgsImp0aSI6ImM5YTNlY2NlZTJhYTQ2NjM5YTUxNzI3MDA0ZDhiYjI3IiwidXNlcl9pZCI6MjIyfQ.trNl-QXkI6Eh2QETTccBXqM58rLkB1RmFkvpMOc5VXU
     val accountAccessToken: Flow<String>
     suspend fun updateAccountAccessToken(accessToken: String)
+
+    //test@gmail.com
+    val accountEmail: Flow<String>
+    suspend fun updateEmail(email: String)
 
     // member or moderator
     val accountInviteType: Flow<String>

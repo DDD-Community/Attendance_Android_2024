@@ -7,4 +7,5 @@ interface InvitesRepository {
     fun validate(inviteCode: String): Flow<Validate>
     fun getInviteType(): Flow<String>
     fun getInviteCodeId(): Flow<String>
+    suspend fun setInviteType()
 }
