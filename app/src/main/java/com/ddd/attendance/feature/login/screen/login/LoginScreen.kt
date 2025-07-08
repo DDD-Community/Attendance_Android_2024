@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityOptionsCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ddd.attendance.R
 import com.ddd.attendance.core.designsystem.DDDText
@@ -36,10 +37,12 @@ import com.ddd.attendance.core.ui.theme.DDD_BLACK
 import com.ddd.attendance.feature.login.LoginProcessActivity
 import com.ddd.attendance.feature.login.LoginProcessViewModel
 import com.ddd.attendance.feature.login.ScreenName
+import com.ddd.attendance.feature.login.UiState
 import com.ddd.attendance.feature.login.model.CheckEmailUiState
 import com.ddd.attendance.feature.login.model.LoginEmailUiState
 import com.ddd.attendance.feature.login.model.ProfileMeUiState
 import com.ddd.attendance.feature.main.MainActivity
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,32 +57,10 @@ fun LoginScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val checkEmailUiState by viewModel.checkEmailUiState.collectAsState()
     val loginEmailUiState by viewModel.loginEmailUiState.collectAsState()
-
-    LaunchedEffect(checkEmailUiState) {
-        if (checkEmailUiState is CheckEmailUiState.Success) {
-            val isEmailUsed = (checkEmailUiState as CheckEmailUiState.Success).data.emailUsed
-
-            if (isEmailUsed) { //기존 회원
-                viewModel.loginEmail()
-            }
-            else { // 신규회원 프로세스
-                navController.navigate(route = ScreenName.INVITATION_CODE.name)
-                viewModel.resetCheckEmailUiState()
-            }
-        }
-    }
-
-    LaunchedEffect(loginEmailUiState) {
-        if (loginEmailUiState is LoginEmailUiState.Success) {
-            context?.let {
-                val options = ActivityOptionsCompat.makeCustomAnimation(it, android.R.anim.fade_in, android.R.anim.fade_out)
-                it.startActivity(Intent(context, MainActivity::class.java), options.toBundle())
-                it.finish()
-            }
-        }
-    }
 
     LaunchedEffect(snackBarMessage) {
         snackBarMessage?.let {
@@ -92,12 +73,24 @@ fun LoginScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.navigateToInvitation.collectLatest {
+            navController.navigate(route = ScreenName.INVITATION_CODE.name)
+        }
+        viewModel.openMainActivity.collectLatest {
+            context?.let {
+                val options = ActivityOptionsCompat.makeCustomAnimation(it, android.R.anim.fade_in, android.R.anim.fade_out)
+                it.startActivity(Intent(context, MainActivity::class.java), options.toBundle())
+                it.finish()
+            }
+        }
+    }
+
     Content(
         snackBarHostState = snackBarHostState,
         onClickGoogle = { //  로그인 성공 결과
             onClickGoogle { result -> // google oauth result
-                viewModel.setUpdateUser(result) // 유저 정보 저장
-                viewModel.checkEmail()
+                viewModel.setUiState(UiState.Success(result))
             }
         }
     )
